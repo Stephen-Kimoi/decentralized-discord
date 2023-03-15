@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract DecentDisc is ERC721 {
     address public owner;
     uint256 public channelNo; 
+    uint256 public mintedNFTs; 
 
     struct Channel {
         uint256 id; 
@@ -13,17 +14,27 @@ contract DecentDisc is ERC721 {
         uint256 cost; 
     } 
 
-    mapping (uint256 => Channel) public channels; 
+    mapping(uint256 => Channel) public channels; 
+    mapping(uint256 => mapping(address => bool)) public joinedChannel; 
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {
         // ERC721(_name, _symbol); 
         owner = msg.sender; 
     } 
 
-    
-
-    function createChannel(string memory name, uint256 cost) public {
+    modifier onlyOwner {
         require(msg.sender == owner, "ERC721: Not owner of channel!"); 
+        _; 
+    }
+
+    function mint(uint256 id) public payable {
+       //    require 
+       joinedChannel[id][msg.sender] = true; 
+       mintedNFTs++; 
+       _safeMint(msg.sender, mintedNFTs); 
+    }
+
+    function createChannel(string memory name, uint256 cost) public onlyOwner {
         channelNo += 1; 
         channels[channelNo] = Channel(channelNo, name, cost); 
     }
