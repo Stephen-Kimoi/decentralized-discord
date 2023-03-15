@@ -84,4 +84,29 @@ describe("DecentDisc", () => {
       })
 
    })
+
+   describe("WIthdrawing funds", async () => {
+     const ID = 1; 
+     const AMOUNT = ethers.utils.parseUnits("1", "ether"); 
+     let balanceBefore; 
+
+     beforeEach( async () => {
+        balanceBefore = await ethers.provider.getBalance(OWNER.address); 
+        let tx = await decentContract.connect(ADDRESS1).mint(ID, {value: AMOUNT}); 
+        await tx.wait(); 
+
+        tx = await decentContract.connect(OWNER).withdraw(); 
+        await tx.wait(); 
+     })
+
+     it("Updates the owners balance", async () => {
+        const balanceAfter = await ethers.provider.getBalance(OWNER.address); 
+        expect(balanceAfter).to.greaterThan(balanceBefore); 
+     })
+
+     it("Updates contract balance", async () => {
+        const result = await ethers.provider.getBalance(decentContract.address); 
+        expect(result).to.equal(0)
+     })
+   })
 })
