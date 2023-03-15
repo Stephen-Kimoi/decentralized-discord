@@ -32,7 +32,7 @@ contract DecentDisc is ERC721 {
         require(id <= channelNo); 
         require(joinedChannel[id][msg.sender] == false); 
         require(msg.value >= channels[id].cost); 
-         
+
        joinedChannel[id][msg.sender] = true; 
        mintedNFTs++; 
        _safeMint(msg.sender, mintedNFTs); 
@@ -45,5 +45,10 @@ contract DecentDisc is ERC721 {
 
     function getChannel(uint256 id) public view returns (Channel memory){
         return channels[id]; 
+    }
+
+    function withdraw() public onlyOwner {
+        (bool success, ) = owner.call{value: address(this).balance}(""); 
+        require(success); contracts/DecentDisc.sol
     }
 }
