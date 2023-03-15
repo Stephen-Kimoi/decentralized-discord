@@ -58,4 +58,30 @@ describe("DecentDisc", () => {
        })
 
    })
+
+   describe("Joins channel", () => {
+      const ID = 1; 
+      const AMOUNT = ethers.utils.parseUnits("1", "ether"); 
+
+      beforeEach( async() => {
+        const tx = await decentContract.connect(ADDRESS1).mint(ID, {value: AMOUNT}); 
+        await tx.wait(); 
+      })
+
+      it("Joined channel to be true", async () => {
+        const result = await decentContract.joinedChannel(1, ADDRESS1.address); 
+        expect(result).to.equal(true); 
+      })
+
+      it("Increases number of IDs", async () => {
+        const result = await decentContract.mintedNFTs(); 
+        expect(result).to.equal(ID); 
+      })
+
+      it("Contract balance increases", async () => {
+        const result = await ethers.provider.getBalance(decentContract.address); 
+        expect(result).to.equal(AMOUNT); 
+      })
+
+   })
 })
