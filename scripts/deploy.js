@@ -1,3 +1,4 @@
+// Contract address:  0x5FbDB2315678afecb367f032d93F642f64180aa3
 const { ethers } = require("hardhat");
 const hre = require("hardhat"); 
 
@@ -11,7 +12,7 @@ const main = async () => {
 
   const [deployer] = await ethers.getSigners(); 
   const contractFactory = await ethers.getContractFactory("DecentDisc"); 
-  const decentDisc = await contractFactory.deploy(); 
+  const decentDisc = await contractFactory.deploy(name, symbol); 
   await decentDisc.deployed();  
 
   console.log('Contract address: ', decentDisc.address); 
@@ -26,3 +27,15 @@ const main = async () => {
     console.log("Created channel: ", channel_names[i]); 
   }
 }
+
+const runMain = async () => {
+  try {
+    await main();
+    process.exit(0);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
+
+runMain();
