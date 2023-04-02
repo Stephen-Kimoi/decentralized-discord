@@ -1,0 +1,82 @@
+.navbar {
+    width: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .navbar.dark {
+    background-color: var(--main-grey); 
+    color: white;
+  }
+  
+  .navbar-container {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .end-container {
+    display: flex;
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .logo-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+    color: inherit;
+  }
+  
+  .button-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .connect-button {
+    background-color: var(--main-dark-grey);
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .connect-button:hover {
+    background-color: var(--main-blue);
+  }
+  
+  .node-toggle-button {
+    background-color: var(--main-text-grey);
+    padding: 5px;
+    color: inherit;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border: none; 
+    border-radius: 7px;
+  }
+  
+  .mode-toggle-button:hover {
+    text-decoration: underline;
+  }
+  
