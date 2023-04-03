@@ -1,8 +1,16 @@
 import React, { useState } from 'react'
+import { ethers } from 'ethers';
 import "./styles/Navbar.css"
 
-const Navbar = () => {
+const Navbar = ({ account, walletConnected, setAccount }) => {
   const [isDarkMode, setIsDarkMode] = useState(false); 
+
+  const connectWallet = async () => {
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" }); 
+    const account = ethers.utils.getAddress(accounts[0]); 
+    console.log(account.slice(0, 6)); 
+    setAccount(account); 
+  }
   
   const handleToggleDarkMode = () => {
     setIsDarkMode(!isDarkMode); 
@@ -19,7 +27,22 @@ const Navbar = () => {
         
         <div className='end-container'>
           <div className="button-container">
-            <button className="connect-button">Connect Wallet</button>
+            { 
+              account ? (
+                <button 
+                  className="connect-button"
+                >
+                  {account.slice(0,6) }...{ account.slice(38,42)}
+                </button>
+              ) : (
+                <button 
+                  className="connect-button"
+                  onClick={connectWallet}
+                >
+                  Connect Wallet
+                </button>
+              )
+            }
           </div>
         
           <button className='node-toggle-button' onClick={handleToggleDarkMode}>
