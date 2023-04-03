@@ -15,6 +15,26 @@
   --main-text-grey: #66666e;
 }
 
+main {
+  background-color: var(--main-white);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  height: 92vh;
+}
+
+main.dark {
+  background-color: var(--main-dark-grey);
+  color: var(--main-white);
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+  }
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
