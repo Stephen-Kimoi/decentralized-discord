@@ -1,0 +1,129 @@
+/* .messages {
+    width: 60vw;
+    min-width: 600px;
+    margin-left: 20px;
+    background-color: var(--main-light-grey);
+    grid-column: 4/13;
+    display: grid;
+    grid-template-rows: repeat(12, 1fr);
+} */
+
+.text .messages {
+    grid-row: 1/11;
+  
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+  
+    overflow-y: scroll;
+    scroll-snap-align: end;
+    max-height: 75vh;
+  }
+  
+  .text .message {
+    width: 95%;
+    border-radius: 6px;
+  
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  
+    margin: 10px auto 0;
+    padding: 10px;
+  }
+  
+  .text .message:hover {
+    background-color: var(--main-grey);
+  }
+  
+  .text .message img {
+    background-color: var(--main-grey);
+  
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  
+    padding: 10px;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .message_content h3 {
+    color: var(--main-white);
+    font-size: 1.05em;
+    font-weight: 500;
+    margin-left: 15px;
+  }
+  
+  .message_content p {
+    color: var(--main-white);
+    font-size: 1.05em;
+    font-weight: 300;
+    margin-left: 15px;
+  }
+  
+  .text form {
+    grid-row: 11/13;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .text form input[type="text"] {
+    grid-row: 11/13;
+  
+    background-color: var(--main-grey);
+    color: var(--main-white);
+  
+    border: none;
+    border-radius: 6px 0 0 6px;
+  
+    width: 85%;
+    height: 40%;
+  
+    padding: 10px;
+  
+    font-family: "Open Sans";
+  }
+  
+  .text form button {
+    background-color: var(--main-grey);
+  
+    width: 60px;
+    height: 40%;
+    padding: 10px;
+  
+    border: none;
+    border-radius: 0 6px 6px 0;
+  
+    cursor: pointer;
+    transition: all 250ms ease;
+  }
+  
+  .text form button:hover {
+    background-color: var(--main-dark-grey);
+  }
+  
+  .text form img {
+    width: 25px;
+    height: 25px;
+  }
+
+@media (max-width: 768px) {
+    .messages {
+        width: 100%;
+        min-width: auto;
+        margin: 0;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .messages {
+      min-width: auto;
+      width: 100%;
+    }
+  }
