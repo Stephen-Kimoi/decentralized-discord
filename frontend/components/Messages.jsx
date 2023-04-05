@@ -3,8 +3,12 @@ import './styles/Messages.css'
 
 const Messages = () => {
   return (
-    <div className='messages'>
-      Messages
+    <div className='text'>
+
+      <div className='messages'>
+        Messages
+      </div>
+      
     </div>
   )
 }

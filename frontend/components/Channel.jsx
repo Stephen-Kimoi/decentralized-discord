@@ -1,7 +1,7 @@
 import React from 'react'
 import './styles/Channel.css'
 
-const Channel = () => {
+const Channel = ({provider, account, channels, decentDisc}) => {
   return (
     <div className='channels'>
 
@@ -9,9 +9,9 @@ const Channel = () => {
          <h3>Text Channels</h3>
 
          <ul>
-            <li>
-                Channel name
-            </li>
+           {channels.map( (channel, index) => (
+             <li key={index}>{channel.name}</li>
+           ))}
          </ul>
 
       </div>
@@ -24,7 +24,7 @@ const Channel = () => {
             <li>Channel 2</li>
             <li>Channel 3</li>
          </ul>
-         
+
       </div>
     </div>
   )
