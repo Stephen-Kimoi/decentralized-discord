@@ -1,13 +1,14 @@
 import React from 'react'
 import './styles/Channel.css'
 
-const Channel = ({provider, account, channels, decentDisc}) => {
+const Channel = ({provider, account, channels, decentDisc, currentChannel, setCurrentChannel}) => {
 
   const channelHandler = async (channel) => {
     const joinedChannel = await decentDisc.joinedChannel(channel.id, account); 
     
     if(joinedChannel){
       console.log("Joined!")
+      setCurrentChannel(channel)
     } else {
       console.log("Mnting NFT for joining channel..."); 
       const signer = await provider.getSigner(); 
@@ -27,6 +28,7 @@ const Channel = ({provider, account, channels, decentDisc}) => {
              <li 
                key={index}
                onClick={ () => channelHandler(channel) }
+               className={currentChannel && currentChannel.id.toString() === channel.id.toString() ? "active" : ""}
                >
                 {channel.name}
                </li>

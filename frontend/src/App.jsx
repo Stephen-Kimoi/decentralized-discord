@@ -15,6 +15,7 @@ function App() {
   const [provider, setProvider] = useState(); 
   const [decentDisc, setDecentDisc] = useState(); 
   const [channels, setChannels] = useState([]); 
+  const [currentChannel, setCurrentChannel] = useState(null); 
 
   const handleToggleDarkMode = () => {
     setIsDarkMode(!isDarkMode); 
@@ -71,6 +72,8 @@ function App() {
           account={account}
           decentDisc={decentDisc}
           channels={channels}
+          currentChannel={currentChannel}
+          setCurrentChannel={setCurrentChannel}
         /> 
 
         <Messages 
