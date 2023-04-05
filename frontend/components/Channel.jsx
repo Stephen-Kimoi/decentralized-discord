@@ -2,6 +2,20 @@ import React from 'react'
 import './styles/Channel.css'
 
 const Channel = ({provider, account, channels, decentDisc}) => {
+
+  const channelHandler = async (channel) => {
+    const joinedChannel = await decentDisc.joinedChannel(channel.id, account); 
+    
+    if(joinedChannel){
+      console.log("Joined!")
+    } else {
+      console.log("Mnting NFT for joining channel..."); 
+      const signer = await provider.getSigner(); 
+      const tx = await decentDisc.connect(signer).mint(channel.id, {value: channel.cost});
+      await tx.wait();
+    }
+  }
+
   return (
     <div className='channels'>
 
@@ -10,7 +24,12 @@ const Channel = ({provider, account, channels, decentDisc}) => {
 
          <ul>
            {channels.map( (channel, index) => (
-             <li key={index}>{channel.name}</li>
+             <li 
+               key={index}
+               onClick={ () => channelHandler(channel) }
+               >
+                {channel.name}
+               </li>
            ))}
          </ul>
 
