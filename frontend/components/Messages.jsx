@@ -12,8 +12,30 @@ const Messages = ({account, messages, currentChannel}) => {
 
   const sendMessage = async (e) => {
     e.preventDefault(); 
+
+    const messageObj = {
+      channel: currentChannel.id.toString(), 
+      account: account, 
+      text: message
+    }
+
+    if (message !== ""){
+      socket.emit('new message', messageObj)
+    }
+    setMessage(""); 
+
     console.log("Sending message: ", message); 
   }
+
+  const scrollHandler = () => {
+    setTimeout(() => {
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }, 500)
+  }
+
+  useEffect(() => {
+    scrollHandler()
+  }, [])
 
   return (
     <div className='text'>
