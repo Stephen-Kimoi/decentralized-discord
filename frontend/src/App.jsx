@@ -64,7 +64,6 @@ function App() {
     })
 
     socket.on('get messages', (messages) => {
-      console.log("Messages: ", messages);
       setMessages(messages); 
     })
 

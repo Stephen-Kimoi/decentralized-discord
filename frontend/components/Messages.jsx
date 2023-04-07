@@ -6,8 +6,14 @@ import './styles/Messages.css'
 const socket = io('http://localhost:3030'); 
 
 const Messages = ({account, messages, currentChannel}) => {
+  const [message, setMessage] = useState(''); 
 
   const messageEndRef = useRef(); 
+
+  const sendMessage = async (e) => {
+    e.preventDefault(); 
+    console.log("Sending message: ", message); 
+  }
 
   return (
     <div className='text'>
@@ -29,8 +35,15 @@ const Messages = ({account, messages, currentChannel}) => {
       </div>
 
       <form onSubmit={sendMessage}>
-         <input type='text'></input>
-
+        { currentChannel && account ? (
+          <input 
+            type='text' 
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder={`Message #${currentChannel.name}`}
+          ></input>
+        ) : (
+          <input type='text' value="" placeholder={`Connect wallet & Join the channel`} disabled/> 
+        )}
          <button type='submit'>
            <img src="./send.svg" alt="send message" />
          </button>
