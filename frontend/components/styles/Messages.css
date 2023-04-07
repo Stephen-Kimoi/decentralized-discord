@@ -8,6 +8,10 @@
     grid-template-rows: repeat(12, 1fr);
 } */
 
+.text {
+  width: 60vw;
+}
+
 .text .messages {
     grid-row: 1/11;
   

@@ -103,6 +103,9 @@ function App() {
 
         <Messages 
           handleToggleDarkMode={handleToggleDarkMode}
+          account={account}
+          messages={messages} 
+          currentChannel={currentChannel}
         /> 
       </main>
 
