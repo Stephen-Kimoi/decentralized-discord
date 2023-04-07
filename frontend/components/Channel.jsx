@@ -14,6 +14,7 @@ const Channel = ({provider, account, channels, decentDisc, currentChannel, setCu
       const signer = await provider.getSigner(); 
       const tx = await decentDisc.connect(signer).mint(channel.id, {value: channel.cost});
       await tx.wait();
+      setCurrentChannel(channel); 
     }
   }
 

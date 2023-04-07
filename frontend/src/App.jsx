@@ -6,6 +6,9 @@ import Channel from '../components/Channel';
 import Messages from '../components/Messages';
 import abi from '../abi/DecentDisc.json'; 
 import config from '../config.json';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3030'); 
 
 
 function App() {
@@ -16,6 +19,7 @@ function App() {
   const [decentDisc, setDecentDisc] = useState(); 
   const [channels, setChannels] = useState([]); 
   const [currentChannel, setCurrentChannel] = useState(null); 
+  const [messages, setMessages] = useState([]); 
 
   const handleToggleDarkMode = () => {
     setIsDarkMode(!isDarkMode); 
@@ -47,7 +51,28 @@ function App() {
   } 
 
   useEffect( () => {
-    loadBlockchainData()
+    loadBlockchainData(); 
+
+    socket.on('connect', () => {
+      console.log("Socket connected...")
+      socket.emit('get messages')
+    })
+
+    socket.on('new message', (messages) => {
+      console.log("new message..."); 
+      setMessages(messages); 
+    })
+
+    socket.on('get messages', (messages) => {
+      console.log("Messages: ", messages);
+      setMessages(messages); 
+    })
+
+    return () => {
+      socket.off('connect')
+      socket.off('new message')
+      socket.off('get messages')
+    }
   }, [account])
 
   return (
