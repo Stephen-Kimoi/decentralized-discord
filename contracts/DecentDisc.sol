@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "hardhat/console.sol";
 
 interface IDecentDiscToken {
     function balanceOf(address account) external view returns (uint256);
@@ -51,6 +52,13 @@ contract DecentDisc is ERC721 {
 
     function getChannel(uint256 id) public view returns (Channel memory){
         return channels[id]; 
+    }
+
+    function sendTokens(address recipient, uint256 amount) public onlyOwner {
+       console.log("Address balance: ", IDecentDiscToken(address(this)).balanceOf(address(this))); 
+       console.log("Amount to be sent", amount); 
+       require(IDecentDiscToken(address(this)).balanceOf(address(this)) >= amount, "Insufficient balance");
+       require(IDecentDiscToken(address(this)).transfer(recipient, amount), "Transfer Failed!"); 
     }
 
     function withdraw() public onlyOwner {
