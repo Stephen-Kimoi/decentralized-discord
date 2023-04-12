@@ -7,6 +7,7 @@ const tokens = (n) => {
 
 describe("DecentDisc", () => {
    let decentContract; 
+   let tokenContract; 
    let NAME = 'DecDisc'; 
    let SYMBOL = "DDSC"; 
    let OWNER; 
@@ -18,10 +19,16 @@ describe("DecentDisc", () => {
         ADDRESS1 = address1; 
 
         const contractFactory = await ethers.getContractFactory("DecentDisc"); 
+        const contractFactory2 = await ethers.getContractFactory("DecentDiscToken"); 
         decentContract = await contractFactory.deploy(NAME, SYMBOL); 
+        tokenContract = await contractFactory2.deploy(decentContract.address, tokens(10)); 
 
         const tx = await decentContract.connect(owner).createChannel("Web3 Devs", tokens(1)); 
         await tx.wait(); 
+
+        // const amount = tokens(100); 
+        // // await tokenContract.connect(OWNER).mint(decentContract.address, amount); 
+        // await tokenContract.connect(OWNER).mint(decentContract.address); 
    })
 
    describe("deployment", () => {
@@ -85,7 +92,7 @@ describe("DecentDisc", () => {
 
    })
 
-   describe("WIthdrawing funds", async () => {
+   describe("Withdrawing funds", async () => {
      const ID = 1; 
      const AMOUNT = ethers.utils.parseUnits("1", "ether"); 
      let balanceBefore; 
@@ -109,4 +116,31 @@ describe("DecentDisc", () => {
         expect(result).to.equal(0)
      })
    })
+
+   describe("Sending DDT", async () => {
+      let contractBalanceBefore; 
+      let addressBalanceBefore; 
+
+      beforeEach( async () => {
+        contractBalanceBefore = await tokenContract.balanceOf(decentContract.address); 
+        addressBalanceBefore = await tokenContract.balanceOf(ADDRESS1.address); 
+        console.log("Contract: ", contractBalanceBefore)
+        console.log("Address: ", addressBalanceBefore)
+
+        // const amount = tokens(1); 
+        // // await tokenContract.connect(OWNER).mint(decentContract.address, amount); 
+        // await tokenContract.connect(OWNER).mint(decentContract.address); 
+
+        let tx = await decentContract.sendTokens(ADDRESS1.address, tokens(1)); 
+        await tx.wait(); 
+      })
+
+      it("Send tokens to address 1", async () => {
+        const newAddressBalance = await tokenContract.balanceOf(decentContract.address); 
+        const expectedAddressBalance = addressBalanceBefore.add(tokens(1)); 
+        // expect(contractBalanceBefore).to.greaterThan(newAddressBalance); 
+        expect(newAddressBalance).to.equal(expectedAddressBalance); 
+      })
+   })
+
 })
