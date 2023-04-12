@@ -4,7 +4,8 @@ import Navbar from '../components/Navbar'
 import Server from '../components/Server';
 import Channel from '../components/Channel';
 import Messages from '../components/Messages';
-import abi from '../abi/DecentDisc.json'; 
+import { abi as contractAbi } from '../abi/DecentDisc.json'; 
+import { abi as tokenAbi } from "../abi/DecentDiscToken.json"
 import config from '../config.json';
 import { io } from 'socket.io-client';
 
@@ -31,8 +32,12 @@ function App() {
     
     const network = await provider.getNetwork(); 
     
-    const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, abi.abi, provider); 
+    const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, provider); 
+    const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, provider); 
     setDecentDisc(decentDisc); 
+
+    const addressBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
+    console.log("Address balance: ", addressBalance.toString()); 
 
     const allChannels = await decentDisc.channelNo(); 
     const channels = []; 
