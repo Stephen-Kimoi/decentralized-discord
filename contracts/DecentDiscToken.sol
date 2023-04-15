@@ -5,10 +5,14 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "hardhat/console.sol";
 
 contract DecentDiscToken is ERC20 {
-    address public contractAddress; 
 
-   constructor(address decentDisc, uint256 amount) ERC20("Decent Disc Token", "DDT"){
-        _mint(decentDisc, 10000 * 10 ** 18);
-        _transfer(decentDisc, address(this), amount);
+   constructor() ERC20("Decent Disc Token", "DDT"){
+      uint256 initialSupply = 1000; 
+      _mint(msg.sender, initialSupply); 
+    } 
+
+    function mint(address to, uint256 amount) public {
+        // require(msg.sender == address(this), "Only the DecentDisc contract can mint tokens."); 
+        _mint(to, amount); 
     }
 }

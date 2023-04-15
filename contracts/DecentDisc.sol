@@ -3,14 +3,10 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "hardhat/console.sol";
-
-interface IDecentDiscToken {
-    function balanceOf(address account) external view returns (uint256);
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-}
+import './IDecentDiscToken.sol';
 
 contract DecentDisc is ERC721 {
+    IDecentDiscToken public token; 
     address public owner;
     uint256 public channelNo; 
     uint256 public mintedNFTs; 
@@ -24,9 +20,11 @@ contract DecentDisc is ERC721 {
     mapping(uint256 => Channel) public channels; 
     mapping(uint256 => mapping(address => bool)) public joinedChannel; 
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {
+    constructor(address tokenAddress, string memory name, string memory symbol) ERC721(name, symbol) {
         // ERC721(_name, _symbol); 
         owner = msg.sender; 
+        token = IDecentDiscToken(tokenAddress); 
+        token.mint(address(this), 10000 * 10**18); 
     } 
 
     modifier onlyOwner {
@@ -54,11 +52,11 @@ contract DecentDisc is ERC721 {
         return channels[id]; 
     }
 
-    function sendTokens(address recipient, uint256 amount) public onlyOwner {
-       console.log("Address balance: ", IDecentDiscToken(address(this)).balanceOf(address(this))); 
-       console.log("Amount to be sent", amount); 
-       require(IDecentDiscToken(address(this)).balanceOf(address(this)) >= amount, "Insufficient balance");
-       require(IDecentDiscToken(address(this)).transfer(recipient, amount), "Transfer Failed!"); 
+    function sendTokens(address recipient, uint256 amount) public {
+        require(token.balanceOf(address(this)) >= amount, "DecentDisc: Not enough tokens available");
+
+        bool success = token.transfer(recipient, amount);
+        require(success, "DecentDisc: Token transfer failed"); 
     }
 
     function withdraw() public onlyOwner {
