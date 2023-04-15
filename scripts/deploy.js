@@ -66,3 +66,7 @@ runMain();
 // Decent Disc contract address:  0x7a2088a1bFc9d81c55368AE168C2C02570cB814F
 // Token contract address:  0x4A679253410272dd5232B3Ff7cF5dbB88f295319
 // Deployer address:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+// Decent Disc contract address:  0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690
+// Token contract address:  0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E
+// Deployer address:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
