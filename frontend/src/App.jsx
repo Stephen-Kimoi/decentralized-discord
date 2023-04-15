@@ -31,12 +31,27 @@ function App() {
     setProvider(provider); 
     
     const network = await provider.getNetwork(); 
+    const signer = await provider.getSigner(); 
+    const address = await signer.getAddress();
+    
+    const tokens = (n) => {
+      return ethers.utils.parseUnits(n.toString(), "ether")
+    } 
     
     const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, provider); 
     const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, provider); 
     setDecentDisc(decentDisc); 
 
-    const addressBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
+    // const signer2 = provider.getSigner("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"); 
+    const decentDisc2 = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, signer);
+
+    const contractBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
+    console.log("Contract balance: ", contractBalance.toString()); 
+
+    let tx = await decentDisc2.sendTokens(address, tokens(1), { gasLimit: 1000000 });
+    await tx.wait(); 
+
+    const addressBalance = await decentDiscToken.balanceOf(address); 
     console.log("Address balance: ", addressBalance.toString()); 
 
     const allChannels = await decentDisc.channelNo(); 
