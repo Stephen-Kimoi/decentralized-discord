@@ -5,7 +5,7 @@ import Server from '../components/Server';
 import Channel from '../components/Channel';
 import Messages from '../components/Messages';
 import { abi as contractAbi } from '../abi/DecentDisc.json'; 
-import { abi as tokenAbi } from "../abi/DecentDiscToken.json"
+import { abi as tokenAbi } from "../abi/DecentDiscToken.json"; 
 import config from '../config.json';
 import { io } from 'socket.io-client';
 
@@ -17,7 +17,9 @@ function App() {
   const [account, setAccount] = useState(); 
   const {walletConnected, setWalletConnected} = useState(false); 
   const [provider, setProvider] = useState(); 
-  const [decentDisc, setDecentDisc] = useState(); 
+  const [decentDiscProvider, setDecentDiscProvider] = useState(); 
+  const [decentDiscSigner, setDecentDiscSigner] = useState(); 
+  const [decentDiscToken, setDecentDiscToken] = useState(); 
   const [channels, setChannels] = useState([]); 
   const [currentChannel, setCurrentChannel] = useState(null); 
   const [messages, setMessages] = useState([]); 
@@ -32,34 +34,21 @@ function App() {
     
     const network = await provider.getNetwork(); 
     const signer = await provider.getSigner(); 
-    const address = await signer.getAddress();
     
-    const tokens = (n) => {
-      return ethers.utils.parseUnits(n.toString(), "ether")
-    } 
-    
-    const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, provider); 
-    const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, provider); 
-    setDecentDisc(decentDisc); 
+    const decentDiscProvider = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, provider);  
+    setDecentDiscProvider(decentDiscProvider); 
 
-    // const signer2 = provider.getSigner("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"); 
-    const decentDisc2 = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, signer);
+    const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, provider);
+    setDecentDiscToken(decentDiscToken); 
+    const decentDiscSigner = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, signer);
+    setDecentDiscSigner(decentDiscSigner); 
 
-    const contractBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
-    console.log("Contract balance: ", contractBalance.toString()); 
-
-    let tx = await decentDisc2.sendTokens(address, tokens(1), { gasLimit: 1000000 });
-    await tx.wait(); 
-
-    const addressBalance = await decentDiscToken.balanceOf(address); 
-    console.log("Address balance: ", addressBalance.toString()); 
-
-    const allChannels = await decentDisc.channelNo(); 
+    const allChannels = await decentDiscProvider.channelNo(); 
     const channels = []; 
     // console.log("Total channels: ", allChannels.toString()); 
 
     for (let i = 0; i <= allChannels; i++) {
-      const channel = await decentDisc.getChannel(i); 
+      const channel = await decentDiscProvider.getChannel(i); 
       channels.push(channel); 
     }
 
@@ -69,6 +58,29 @@ function App() {
       window.location.reload()
     })
   } 
+
+  const sendTokens = async () => {
+    try {
+      const tokens = (n) => {
+        return ethers.utils.parseUnits(n.toString(), "ether")
+      } 
+      
+      const signer = await provider.getSigner(); 
+      const address = await signer.getAddress();
+      const network = await provider.getNetwork(); 
+
+      const contractBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
+      console.log("Contract balance: ", contractBalance.toString()); 
+
+      let tx = await decentDiscSigner.sendTokens(address, tokens(1), { gasLimit: 1000000 });
+      await tx.wait(); 
+
+      const addressBalance = await decentDiscToken.balanceOf(address); 
+      console.log("Address balance: ", addressBalance.toString()); 
+    } catch (error) {
+      console.error(error); 
+    } 
+  }
 
   useEffect( () => {
     loadBlockchainData(); 
@@ -114,7 +126,7 @@ function App() {
           handleToggleDarkMode={handleToggleDarkMode}
           provider={provider}
           account={account}
-          decentDisc={decentDisc}
+          decentDisc={decentDiscProvider}
           channels={channels}
           currentChannel={currentChannel}
           setCurrentChannel={setCurrentChannel}
@@ -127,6 +139,10 @@ function App() {
           currentChannel={currentChannel}
         /> 
       </main>
+
+      <button onClick={sendTokens}>
+        Send Tokens
+      </button>
 
     </div>
   )
