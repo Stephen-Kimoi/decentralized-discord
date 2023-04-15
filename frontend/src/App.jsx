@@ -8,8 +8,11 @@ import { abi as contractAbi } from '../abi/DecentDisc.json';
 import { abi as tokenAbi } from "../abi/DecentDiscToken.json"; 
 import config from '../config.json';
 import { io } from 'socket.io-client';
+// require("dotenv").config();
 
 const socket = io('http://localhost:3030'); 
+
+// const PRIVATE_KEY = process.env.LOCALNETWORK_PRIVATE_KEY; 
 
 
 function App() {
@@ -23,6 +26,9 @@ function App() {
   const [channels, setChannels] = useState([]); 
   const [currentChannel, setCurrentChannel] = useState(null); 
   const [messages, setMessages] = useState([]); 
+  const [accountPoints, setAccountPoints] = useState([]); 
+  const [config, setConfig] = useState(null); 
+
 
   const handleToggleDarkMode = () => {
     setIsDarkMode(!isDarkMode); 
@@ -57,9 +63,10 @@ function App() {
     window.ethereum.on('accountsChanged', function () {
       window.location.reload()
     })
+
   } 
 
-  const sendTokens = async () => {
+  const sendTokens = async (account) => {
     try {
       const tokens = (n) => {
         return ethers.utils.parseUnits(n.toString(), "ether")
@@ -72,14 +79,41 @@ function App() {
       const contractBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
       console.log("Contract balance: ", contractBalance.toString()); 
 
-      let tx = await decentDiscSigner.sendTokens(address, tokens(1), { gasLimit: 1000000 });
+      const addressBalanceBefore = await decentDiscToken.balanceOf(account);
+      console.log(`Address balance of ${account} before sending tokens is ${addressBalanceBefore}`)
+
+      // let tx = await decentDiscSigner.sendTokens(address, tokens(1), { gasLimit: 1000000 });
+      let tx = await decentDiscSigner.sendTokens(account, tokens(1), { gasLimit: 1000000 });
       await tx.wait(); 
 
-      const addressBalance = await decentDiscToken.balanceOf(address); 
-      console.log("Address balance: ", addressBalance.toString()); 
+      const addressBalance = await decentDiscToken.balanceOf(account); 
+      console.log(`Address balance of ${account}`, addressBalance.toString()); 
     } catch (error) {
       console.error(error); 
     } 
+  }
+
+  const checkAccountPoints = async () => {
+    // console.log("Config from server: ", config); 
+    fetch('/api/config')
+      .then(response => response.json())
+      .then(data => { setConfig(data); console.log('Data from fetch: ', data)} )
+
+    try {
+      accountPoints.forEach((account) => {
+
+        if (account.points > 3){
+          console.log('Account with more points: ', account.account)
+          sendTokens(account.account)
+        } else {
+          console.log(`${account.account} please contribute to the channel to get more points`)
+        }
+
+      });
+
+    } catch (error) {
+      console.error(error); 
+    }
   }
 
   useEffect( () => {
@@ -88,6 +122,11 @@ function App() {
     socket.on('connect', () => {
       console.log("Socket connected...")
       socket.emit('get messages')
+      socket.emit('get points')
+    })
+
+    socket.on('get points', (accounts) => {
+      setAccountPoints(accounts)
     })
 
     socket.on('new message', (messages) => {
@@ -140,7 +179,7 @@ function App() {
         /> 
       </main>
 
-      <button onClick={sendTokens}>
+      <button onClick={checkAccountPoints}>
         Send Tokens
       </button>
 
