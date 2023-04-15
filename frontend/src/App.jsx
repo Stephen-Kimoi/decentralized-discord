@@ -13,6 +13,8 @@ import { io } from 'socket.io-client';
 const socket = io('http://localhost:3030'); 
 
 // const PRIVATE_KEY = process.env.LOCALNETWORK_PRIVATE_KEY; 
+const PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; 
+const rpcProvider = "http://localhost:8545"; 
 
 
 function App() {
@@ -27,7 +29,7 @@ function App() {
   const [currentChannel, setCurrentChannel] = useState(null); 
   const [messages, setMessages] = useState([]); 
   const [accountPoints, setAccountPoints] = useState([]); 
-  const [config, setConfig] = useState(null); 
+  // const [config, setConfig] = useState(null); 
 
 
   const handleToggleDarkMode = () => {
@@ -66,31 +68,36 @@ function App() {
 
   } 
 
-  const sendTokens = async (account) => {
+  const sendTokens = async () => {
     try {
       const tokens = (n) => {
         return ethers.utils.parseUnits(n.toString(), "ether")
       } 
-      
-      const signer = await provider.getSigner(); 
-      const address = await signer.getAddress();
+
       const network = await provider.getNetwork(); 
 
-      const contractBalance = await decentDiscToken.balanceOf(config[network.chainId].DecentDisc.address); 
+      const provider2 = new ethers.providers.JsonRpcProvider(rpcProvider);
+      const wallet = new ethers.Wallet(PRIVATE_KEY, provider2);
+      
+      const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, wallet);
+
+      const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, wallet);
+
+      const contractBalance = await decentDiscToken.balanceOf(decentDisc.address); 
       console.log("Contract balance: ", contractBalance.toString()); 
 
       const addressBalanceBefore = await decentDiscToken.balanceOf(account);
-      console.log(`Address balance of ${account} before sending tokens is ${addressBalanceBefore}`)
+      console.log(`Address balance of ${account} before sending tokens is ${addressBalanceBefore}`);
 
-      // let tx = await decentDiscSigner.sendTokens(address, tokens(1), { gasLimit: 1000000 });
-      let tx = await decentDiscSigner.sendTokens(account, tokens(1), { gasLimit: 1000000 });
+      let tx = await decentDisc.sendTokens(account, tokens(1), { gasLimit: 1000000 });
       await tx.wait(); 
 
       const addressBalance = await decentDiscToken.balanceOf(account); 
-      console.log(`Address balance of ${account}`, addressBalance.toString()); 
+      console.log(`Address balance of ${account} after: `, addressBalance.toString()); 
+
     } catch (error) {
-      console.error(error); 
-    } 
+      console.error(error)
+    }
   }
 
   const checkAccountPoints = async () => {
@@ -179,8 +186,8 @@ function App() {
         /> 
       </main>
 
-      <button onClick={checkAccountPoints}>
-        Send Tokens
+      <button onClick={sendTokens}>
+        Send tokens
       </button>
 
     </div>
