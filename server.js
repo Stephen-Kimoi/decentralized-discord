@@ -52,11 +52,16 @@ const accounts = [
         account: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 
         points: 4
     }, 
-    {
-        account: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 
-        points: 4
-    }
 
+]
+
+const channelCreators = [
+    {
+        account: "0x1b3cB81E51011b549d78bf720b0d924ac763A7C2"
+    }, 
+    {
+        account: "0x701C484bfb40ac628aFA487b6082f084B14AF0BD"
+    }
 ]
 
 const config = {
@@ -101,8 +106,18 @@ io.on('connection', (socket) => {
         io.emit('get points', accounts)
     })
 
+    socket.on('channel creators', () => {
+        io.emit('channel creators', channelCreators)
+    })
+
     socket.on('new message', (msg) => {
         messages.push(msg) 
         io.emit('new message', messages)
     })
+
+    socket.on('new channel creator', (creator) => {
+        channelCreators.push(creator); 
+        io.emitWithAck('new channel creator', creator)
+    })
+    
 })
