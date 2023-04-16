@@ -29,6 +29,8 @@ function App() {
   const [currentChannel, setCurrentChannel] = useState(null); 
   const [messages, setMessages] = useState([]); 
   const [accountPoints, setAccountPoints] = useState([]); 
+  const [accountsWithMorePoints, setAccountsWithMorePoints] = useState([]); 
+  const [accountsSentMessages, setAccountsSentMessages] = useState(); 
   // const [config, setConfig] = useState(null); 
 
 
@@ -100,23 +102,39 @@ function App() {
     }
   }
 
+  const updateAccounts = (messages) => {
+    const updatedAccounts = accountPoints.map((account) => {
+      console.log("Account is: ", account)
+      const accountMessages = messages.filter((message) => {
+        return message.account === account.account; 
+      })
+      const points = accountMessages.length; 
+      return {...account, points}; 
+    })
+    // console.log("UPDATED ACCOUNTS: ", updatedAccounts); 
+    setAccountPoints(updatedAccounts); 
+  }
+
   const checkAccountPoints = async () => {
-    // console.log("Config from server: ", config); 
-    fetch('/api/config')
-      .then(response => response.json())
-      .then(data => { setConfig(data); console.log('Data from fetch: ', data)} )
+    // ERROR IN FETCHING CONFIG FROM API 
+    // fetch('/api/config')
+    //   .then(response => response.json())
+    //   .then(data => { setConfig(data); console.log('Data from fetch: ', data)} )
 
     try {
       accountPoints.forEach((account) => {
 
         if (account.points > 3){
           console.log('Account with more points: ', account.account)
-          sendTokens(account.account)
+          setAccountsWithMorePoints(prev => [...prev, account.account]); // Over here 
+          // sendTokens(account.account)
         } else {
           console.log(`${account.account} please contribute to the channel to get more points`)
         }
 
       });
+
+      // console.log("Accounts that have sent messages: ", accountsSentMessages); 
 
     } catch (error) {
       console.error(error); 
@@ -125,6 +143,7 @@ function App() {
 
   useEffect( () => {
     loadBlockchainData(); 
+    checkAccountPoints(); 
 
     socket.on('connect', () => {
       console.log("Socket connected...")
@@ -142,7 +161,12 @@ function App() {
     })
 
     socket.on('get messages', (messages) => {
+      updateAccounts(messages); 
       setMessages(messages); 
+      let accounts = []; 
+      accounts = messages.map(message => message.account); 
+      // console.log("Accounts socket on: ", accounts)
+      setAccountsSentMessages(accounts);
     })
 
     return () => {
@@ -183,6 +207,8 @@ function App() {
           account={account}
           messages={messages} 
           currentChannel={currentChannel}
+          accountsWithMorePoints={accountsWithMorePoints}
+          accountsSentMessages={accountsSentMessages}
         /> 
       </main>
 
