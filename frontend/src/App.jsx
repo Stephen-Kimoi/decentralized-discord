@@ -29,8 +29,10 @@ function App() {
   const [currentChannel, setCurrentChannel] = useState(null); 
   const [messages, setMessages] = useState([]); 
   const [accountPoints, setAccountPoints] = useState([]); 
+  const [newAccountPoints, setNewAccountPoints] = useState([]);
   const [accountsWithMorePoints, setAccountsWithMorePoints] = useState([]); 
   const [accountsSentMessages, setAccountsSentMessages] = useState(); 
+  const [channelCreators, setChannelCreators] = useState([]); 
   // const [config, setConfig] = useState(null); 
 
 
@@ -104,7 +106,7 @@ function App() {
 
   const updateAccounts = (messages) => {
     const updatedAccounts = accountPoints.map((account) => {
-      console.log("Account is: ", account)
+      // console.log("Account is: ", account)
       const accountMessages = messages.filter((message) => {
         return message.account === account.account; 
       })
@@ -112,7 +114,7 @@ function App() {
       return {...account, points}; 
     })
     // console.log("UPDATED ACCOUNTS: ", updatedAccounts); 
-    setAccountPoints(updatedAccounts); 
+    setNewAccountPoints(updatedAccounts); 
   }
 
   const checkAccountPoints = async () => {
@@ -122,7 +124,7 @@ function App() {
     //   .then(data => { setConfig(data); console.log('Data from fetch: ', data)} )
 
     try {
-      accountPoints.forEach((account) => {
+      newAccountPoints.forEach((account) => {
 
         if (account.points > 3){
           console.log('Account with more points: ', account.account)
@@ -149,6 +151,12 @@ function App() {
       console.log("Socket connected...")
       socket.emit('get messages')
       socket.emit('get points')
+      socket.emit('channel creators')
+    })
+
+    socket.on('channel creators', (channelCreators) => {
+      setChannelCreators(channelCreators); 
+      console.log("NEW CHANNEL CREATORS: ", channelCreators); 
     })
 
     socket.on('get points', (accounts) => {
@@ -173,6 +181,8 @@ function App() {
       socket.off('connect')
       socket.off('new message')
       socket.off('get messages')
+      socket.off('get points')
+      socket.off('channel creators')
     }
   }, [account])
 
@@ -209,6 +219,10 @@ function App() {
           currentChannel={currentChannel}
           accountsWithMorePoints={accountsWithMorePoints}
           accountsSentMessages={accountsSentMessages}
+          newAccountPoints={newAccountPoints}
+          setNewAccountPoints={setNewAccountPoints}
+          channelCreators={channelCreators}
+          setChannelCreators={setChannelCreators}
         /> 
       </main>
 
