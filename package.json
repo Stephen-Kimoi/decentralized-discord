@@ -6,18 +6,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deployTestnet": "npx hardhat run scripts/deploy.js --network polygon_mumbai",
-    "deployLocal": "npx hardhat run scripts/deploy.js --network localhost", 
+    "deployLocal": "npx hardhat run scripts/deploy.js --network localhost",
     "runTest": "npx hardhat run test/DecentDisc.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@coinbase/wallet-sdk": "^3.6.6",
     "@openzeppelin/contracts": "^4.8.2",
+    "@walletconnect/web3-provider": "^1.8.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "hardhat": "^2.13.0",
     "socket.io": "^4.6.1",
-    "socket.io-client": "^4.6.1"
+    "socket.io-client": "^4.6.1",
+    "web3modal": "^1.9.12"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2"
