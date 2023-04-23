@@ -1,104 +1,70 @@
 import "./styles/Navbar.css"; 
-import Web3Modal from "web3modal";
-import { ethers } from "ethers";
-import { useState } from "react";
-import WalletConnect from "@walletconnect/web3-provider";
-import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 
-// const providerOptions = {
-//   coinbasewallet: {
-//     // package: CoinbaseWalletSDK,  
-//     options: {
-//       appName: "Decentralized Discord", 
-//       infuraId: "https://sepolia.infura.io/v3/0b669b0be4fe45a5993838d765cbdf0d",  //**REMOVE API KEY
-//       chainId: 11155111
-//     }
-//   }
-// }
+import { socialLogin, socialLogout, getUser } from "../src/paper.js";
+
+import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
 
 
 const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggleDarkMode }) => {
-  
-  // const providerOptions = {
-  //   binancechainwallet: {
-  //     package: true,
-  //   },
-    // walletconnect: {
-    //   package: WalletConnect, // required
-    //   options: {
-    //     infuraId:  process.env.INFURA_ID// required
-    //   }
-    // },
-  
-    // coinbasewallet: {
-    //   package: CoinbaseWalletSDK, // Required
-    //   options: {
-    //     appName: "Coinbase", // Required
-    //     infuraId: "https://sepolia.infura.io/v3/0b669b0be4fe45a5993838d765cbdf0d", // Required
-    //     chainId: 11155111, //4 for Rinkeby, 1 for mainnet (default)
-    //   },
-    // },
-  // };
+  const [connected, toggleConnect] = useState(false);
+  // const location = useLocation();
+  // const [currentAddress, updateAddress] = useState('0x');
+  const [currentUser, updateUser] = useState(null);
 
-  // const web3Modal = new Web3Modal({
-  //   network: "sepolia",
-  //   theme: "light", // optional, 'dark' / 'light',
-  //   cacheProvider: false, // optional
-  //   providerOptions: {}// required
-  // });
+  async function connectWithPaperWallet() {
+    try {
+      await socialLogin().then((user) => {
+        console.log("Users wallet address is: ", user.walletAddress); 
+        if (UserStatus.LOGGED_IN_WALLET_INITIALIZED === user.status) {
+          setUser();
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
-  // const connectWeb3Wallet = async () => {
-  //   try {
-  //     const web3Provider = await web3Modal.connect();
-  //     const library = new ethers.providers.Web3Provider(web3Provider);
-  //     const web3Accounts = await library.listAccounts();
-  //     setConnectedAccount(web3Accounts[0]);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  async function logout() {
+    try {
+      await socialLogout().then(() => {
+        setUser();
+      });
+    } catch (error) {
+      console.log(error);
+    };
+  }
 
-  // const disconnectWeb3Modal = async () => {
-  //   await web3Modal.clearCachedProvider();
-  //   setConnectedAccount("");
-  // };
+  async function setUser() {
+    try {
+      await getUser().then((user) => {
+        if (user.status === UserStatus.LOGGED_OUT) {
+          console.log(`User not logged in!`)
+          toggleConnect(false);
+          updateUser(null);
+          updateAddress('0x');
+          return;
+        }
+        console.log(`User ${user.walletAddress} logged in!`)
+        updateUser(user);
+        setAccount(user.walletAddress);
+        toggleConnect(true);
+      })
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
-  // let web3modal = new Web3Modal({
-  //   network: "sepolia", 
-  //   theme: "light", 
-  //   cacheProvider: false, 
-  //   providerOptions: {}
-  // }); 
-
-  // const connectWallet = async () => {
-  //   // const accounts = await window.ethereum.request({ method: "eth_requestAccounts" }); 
-  //   // const account = ethers.utils.getAddress(accounts[0]); 
-  //   // console.log(account.slice(0, 6)); 
-  //   // setAccount(account);
-
-  //   // const web3ModalInstance = await web3modal.connect(); 
-  //   // const web3ModalProvider = await new ethers.providers.Web3Provider(web3ModalInstance); 
-  //   // console.log("Provider: ", web3ModalProvider); 
-
-  //   try {
-  //     const web3Provider = await web3modal.connect();
-  //     const library = new ethers.providers.Web3Provider(web3Provider);
-  //     const web3Accounts = await library.listAccounts();
-  //     const network = await library.getNetwork();
-  //     console.log(web3Accounts[0].slice(0, 6)); 
-  //     setAccount(web3Accounts[0]);
-
-  //     console.log("Network : ", network); 
-  //     console.log("Metamask wallet account: ", web3Accounts); 
-  //   // setConnectedAccount(web3Accounts[0]);
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  // const destroyWalletConnection = async () => {
-  //   await web3modal.clearCachedProvider(); 
-  // }
+  useEffect( () => {
+    // setUser();
+    async () => {
+      await getUser().then((user) => {
+        console.log(`User ${user.walletAddress} connected`)
+      }); 
+    }
+  }, [currentUser]);
 
   return (
     <nav className={`navbar ${isDarkMode ? "dark" : "light"}`}>
@@ -121,7 +87,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
               ) : (
                 <button 
                   className="connect-button"
-                  onClick={connectWeb3Wallet}
+                  onClick={connectWithPaperWallet}
                 >
                   Connect Wallet
                 </button>
