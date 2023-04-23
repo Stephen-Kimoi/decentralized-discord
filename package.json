@@ -14,6 +14,7 @@
   "dependencies": {
     "@coinbase/wallet-sdk": "^3.6.6",
     "@openzeppelin/contracts": "^4.8.2",
+    "@paperxyz/embedded-wallet-service-sdk": "^0.2.0",
     "@walletconnect/web3-provider": "^1.8.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
