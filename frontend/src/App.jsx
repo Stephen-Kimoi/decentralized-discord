@@ -8,6 +8,7 @@ import { abi as contractAbi } from '../abi/DecentDisc.json';
 import { abi as tokenAbi } from "../abi/DecentDiscToken.json"; 
 import config from '../config.json';
 import { io } from 'socket.io-client';
+import WalletProviderModal from '../components/WalletModal';
 // require("dotenv").config();
 
 const socket = io('http://localhost:3030'); 
@@ -35,7 +36,15 @@ function App() {
   const [channelCreators, setChannelCreators] = useState([]); 
   const [paperWallet, setPaperWallet] = useState(false); 
   const [currentUser, updateUser] = useState(null);
-  // const [config, setConfig] = useState(null); 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
 
 
   const handleToggleDarkMode = () => {
@@ -211,6 +220,12 @@ function App() {
 
   return (
     <div className="App">
+      <WalletProviderModal 
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleOpen={handleOpen}
+        handleClose={handleClose}
+      /> 
       <Navbar 
         account={account} 
         walletConnected={walletConnected} 
@@ -254,9 +269,10 @@ function App() {
         /> 
       </main>
 
-      <button onClick={sendTokens}>
+      {/* <button onClick={sendTokens}>
         Send tokens
-      </button>
+      </button> */}
+      <button onClick={handleOpen}>Open Wallet Provider Modal</button>
 
     </div>
   )
