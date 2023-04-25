@@ -59,6 +59,10 @@ contract DecentDisc is ERC721 {
         require(success, "DecentDisc: Token transfer failed"); 
     }
 
+    function channelNumbers() public view returns (uint256) {
+        return channelNo; 
+    }
+
     function withdraw() public onlyOwner {
         (bool success, ) = owner.call{value: address(this).balance}(""); 
         require(success); 
