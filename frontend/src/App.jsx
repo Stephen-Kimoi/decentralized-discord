@@ -47,17 +47,20 @@ function App() {
     const network = await provider.getNetwork(); 
     const signer = await provider.getSigner(); 
     
-    const decentDiscProvider = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, provider);  
-    setDecentDiscProvider(decentDiscProvider); 
+    console.log(network)
 
-    const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, provider);
+    const decentDiscProvider = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, provider);  
+    setDecentDiscProvider(decentDiscProvider); 
+    console.log(decentDiscProvider)
+
+    const decentDiscToken = new ethers.Contract(config[31337].DecentDiscToken.address, tokenAbi, provider);
     setDecentDiscToken(decentDiscToken); 
-    const decentDiscSigner = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, signer);
+    const decentDiscSigner = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, signer);
     setDecentDiscSigner(decentDiscSigner); 
 
-    const allChannels = await decentDiscProvider.channelNo(); 
+    const allChannels = await decentDiscProvider.channelNumbers(); 
     const channels = []; 
-    // console.log("Total channels: ", allChannels.toString()); 
+    console.log("Total channels: ", allChannels.toString()); 
 
     for (let i = 0; i <= allChannels; i++) {
       const channel = await decentDiscProvider.getChannel(i); 
@@ -145,7 +148,7 @@ function App() {
 
   useEffect( () => {
     loadBlockchainData(); 
-    checkAccountPoints(); 
+    // checkAccountPoints(); 
 
     socket.on('connect', () => {
       console.log("Socket connected...")
@@ -156,7 +159,7 @@ function App() {
 
     socket.on('channel creators', (channelCreators) => {
       setChannelCreators(channelCreators); 
-      console.log("NEW CHANNEL CREATORS: ", channelCreators); 
+      // console.log("NEW CHANNEL CREATORS: ", channelCreators); 
     })
 
     socket.on('get points', (accounts) => {
@@ -191,6 +194,7 @@ function App() {
       <Navbar 
         account={account} 
         walletConnected={walletConnected} 
+        setWalletConnected={setWalletConnected} 
         setAccount={setAccount} 
         isDarkMode={isDarkMode} 
         setIsDarkMode={setIsDarkMode} 

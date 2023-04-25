@@ -2,17 +2,25 @@ import "./styles/Navbar.css";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
+import { ethers } from "ethers";
 
 import { socialLogin, socialLogout, getUser } from "../src/paper.js";
 
 import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
 
 
-const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggleDarkMode }) => {
+const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggleDarkMode, setWalletConnected }) => {
   const [connected, toggleConnect] = useState(false);
   // const location = useLocation();
   // const [currentAddress, updateAddress] = useState('0x');
   const [currentUser, updateUser] = useState(null);
+
+  const connectWallet = async () => {
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" }); 
+    const account = ethers.utils.getAddress(accounts[0]); 
+    console.log(account.slice(0, 6)); 
+    setAccount(account);
+  }
 
   async function connectWithPaperWallet() {
     try {
@@ -50,6 +58,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
         console.log(`User ${user.walletAddress} logged in!`)
         updateUser(user);
         setAccount(user.walletAddress);
+        setWalletConnected(true); 
         toggleConnect(true);
       })
     } catch (error) {
@@ -87,7 +96,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
               ) : (
                 <button 
                   className="connect-button"
-                  onClick={connectWithPaperWallet}
+                  onClick={connectWallet}
                 >
                   Connect Wallet
                 </button>
