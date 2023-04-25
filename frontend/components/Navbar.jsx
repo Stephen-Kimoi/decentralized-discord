@@ -9,11 +9,11 @@ import { socialLogin, socialLogout, getUser } from "../src/paper.js";
 import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
 
 
-const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggleDarkMode, setWalletConnected }) => {
+const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggleDarkMode, setWalletConnected, setPaperWallet, paperWallet, currentUser, updateUser}) => {
   const [connected, toggleConnect] = useState(false);
   // const location = useLocation();
   // const [currentAddress, updateAddress] = useState('0x');
-  const [currentUser, updateUser] = useState(null);
+  // const [currentUser, updateUser] = useState(null);
 
   const connectWallet = async () => {
     const accounts = await window.ethereum.request({ method: "eth_requestAccounts" }); 
@@ -60,11 +60,20 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
         setAccount(user.walletAddress);
         setWalletConnected(true); 
         toggleConnect(true);
+        setPaperWallet(true); 
       })
     } catch (error) {
       console.error(error);
     }
   }
+
+  // const loadBlockchainData = async () => {
+  //   if (updateUser !== undefined) {
+  //     console.log("Signed using paper wallet!")
+  //   } else {
+  //     console.log("Signed using normal wallet!"); 
+  //   }
+  // }
 
   useEffect( () => {
     // setUser();
@@ -73,6 +82,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
         console.log(`User ${user.walletAddress} connected`)
       }); 
     }
+    // loadBlockchainData(); 
   }, [currentUser]);
 
   return (
@@ -96,7 +106,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
               ) : (
                 <button 
                   className="connect-button"
-                  onClick={connectWallet}
+                  onClick={connectWithPaperWallet}
                 >
                   Connect Wallet
                 </button>

@@ -33,6 +33,8 @@ function App() {
   const [accountsWithMorePoints, setAccountsWithMorePoints] = useState([]); 
   const [accountsSentMessages, setAccountsSentMessages] = useState(); 
   const [channelCreators, setChannelCreators] = useState([]); 
+  const [paperWallet, setPaperWallet] = useState(false); 
+  const [currentUser, updateUser] = useState(null);
   // const [config, setConfig] = useState(null); 
 
 
@@ -41,26 +43,44 @@ function App() {
   }
 
   const loadBlockchainData = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum); 
-    setProvider(provider); 
-    
-    const network = await provider.getNetwork(); 
-    const signer = await provider.getSigner(); 
-    
-    console.log(network)
+    let decentDiscProvider; 
+    let allChannels;
 
-    const decentDiscProvider = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, provider);  
+    if (currentUser !== undefined) {
+
+      const signer = await currentUser.wallet.getEthersJsSigner({
+        rpcEndpoint: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ", // REMOVE THIS
+      });
+
+      decentDiscProvider = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, signer); 
+      setDecentDiscProvider(decentDiscProvider); 
+
+      allChannels = await decentDiscProvider.channelNumbers(); 
+
+      console.log(allChannels.toString());
+    } else {
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum); 
+      setProvider(provider); 
+      
+      const network = await provider.getNetwork(); 
+      const signer = await provider.getSigner(); 
+      
+      decentDiscProvider = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, provider);  
+      // setDecentDiscProvider(decentDiscProvider); 
+      
+      // REMOVE THIS CODE
+      const decentDiscToken = new ethers.Contract(config[31337].DecentDiscToken.address, tokenAbi, provider);
+      setDecentDiscToken(decentDiscToken); 
+      const decentDiscSigner = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, signer);
+      setDecentDiscSigner(decentDiscSigner); 
+
+    }
+     
     setDecentDiscProvider(decentDiscProvider); 
-    console.log(decentDiscProvider)
 
-    const decentDiscToken = new ethers.Contract(config[31337].DecentDiscToken.address, tokenAbi, provider);
-    setDecentDiscToken(decentDiscToken); 
-    const decentDiscSigner = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, signer);
-    setDecentDiscSigner(decentDiscSigner); 
-
-    const allChannels = await decentDiscProvider.channelNumbers(); 
+    allChannels = await decentDiscProvider.channelNumbers(); 
     const channels = []; 
-    console.log("Total channels: ", allChannels.toString()); 
 
     for (let i = 0; i <= allChannels; i++) {
       const channel = await decentDiscProvider.getChannel(i); 
@@ -199,6 +219,10 @@ function App() {
         isDarkMode={isDarkMode} 
         setIsDarkMode={setIsDarkMode} 
         handleToggleDarkMode={handleToggleDarkMode}
+        paperWallet={paperWallet}
+        setPaperWallet={setPaperWallet}
+        currentUser={currentUser} 
+        updateUser={updateUser}
       /> 
       
       <main className={`${isDarkMode ? "dark" : " "}`}>
