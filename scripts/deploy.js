@@ -75,3 +75,11 @@ runMain();
 // Token contract address:  0x5FbDB2315678afecb367f032d93F642f64180aa3
 // Deployer address:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 
+// Decent Disc contract address:  0x0165878A594ca255338adfa4d48449f69242Eb8F
+// Token contract address:  0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
+// Deployer address:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+
+// POLYGON MUMBAI DEPLOY 
+// Decent Disc contract address:  0x4C18d3a1B249d363916055759020ed2672ed8dcE
+// Token contract address:  0x1ad9d4269E0Ce5b4c30483244c261F31fbD5b6f5
+// Deployer address:  0x13Ef924EB7408e90278B86b659960AFb00DDae61

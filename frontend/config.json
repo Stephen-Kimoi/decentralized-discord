@@ -1,10 +1,10 @@
 {
     "31337": {
         "DecentDisc": {
-            "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+            "address": "0x4C18d3a1B249d363916055759020ed2672ed8dcE"
         }, 
         "DecentDiscToken": {
-            "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+            "address": "0x1ad9d4269E0Ce5b4c30483244c261F31fbD5b6f5"
         }
     }
 }
