@@ -8,7 +8,7 @@ import { abi as contractAbi } from '../abi/DecentDisc.json';
 import { abi as tokenAbi } from "../abi/DecentDiscToken.json"; 
 import config from '../config.json';
 import { io } from 'socket.io-client';
-import { WagmiConfig, createClient, configureChains, mainnet} from 'wagmi'
+import { WagmiConfig, createClient, configureChains, mainnet,  useAccount, useDisconnect} from 'wagmi'
 import { polygonMumbai } from 'wagmi/chains'
  
 import { alchemyProvider } from 'wagmi/providers/alchemy'
@@ -22,6 +22,14 @@ import WagmiWallet from '../components/WagmiWallet';
 
 import { socialLogin, socialLogout, getUser } from "../src/paper.js";
 import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
+
+// import {
+//   useAccount,
+//   useConnect,
+//   useDisconnect,
+//   useEnsAvatar,
+//   useEnsName,
+// } from 'wagmi'
 
 const socket = io('http://localhost:3030'); 
 
@@ -49,6 +57,9 @@ function App() {
   const [currentUser, updateUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [connected, toggleConnect] = useState(false);
+
+  // const { disconnect  = useDisconnect()
+  // console.log("UseDisconnect: ", useDisconnect())
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -84,6 +95,14 @@ function App() {
     provider,
     webSocketProvider,
   })
+
+  const { address, connector, isConnected } = useAccount(); 
+  
+  if(address){
+    console.log("Address is: ", address)
+  } else {
+    console.log("Address absent")
+  }
 
   // PAPER WALLET CONNECTION 
   async function connectWithPaperWallet() {
@@ -327,6 +346,10 @@ function App() {
           currentUser={currentUser} 
           updateUser={updateUser}
           handleOpen={handleOpen}
+          isConnected={isConnected}
+          address={address}
+          client={client}
+          WagmiConfig={WagmiConfig}
         /> 
         
         <main className={`${isDarkMode ? "dark" : " "}`}>
@@ -362,7 +385,7 @@ function App() {
           Send tokens
         </button> */}
 
-        <button onClick={handleOpen}>Open Wallet Provider Modal</button>
+        {/* <button onClick={disconnect}>Disconnect wallet</button> */}
 
       </div>
     </WagmiConfig>

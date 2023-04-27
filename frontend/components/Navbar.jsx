@@ -9,7 +9,22 @@ import { socialLogin, socialLogout, getUser } from "../src/paper.js";
 import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
 
 
-const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggleDarkMode, setWalletConnected, setPaperWallet, paperWallet, currentUser, updateUser}) => {
+const Navbar = ({ 
+  account, 
+  walletConnected, 
+  setAccount, 
+  isDarkMode, 
+  handleToggleDarkMode, 
+  setWalletConnected, 
+  setPaperWallet, 
+  paperWallet, 
+  currentUser, 
+  updateUser, 
+  handleOpen, 
+  isConnected, 
+  address, 
+  client, 
+  WagmiConfig }) => {
   const [connected, toggleConnect] = useState(false);
   // const location = useLocation();
   // const [currentAddress, updateAddress] = useState('0x');
@@ -22,59 +37,6 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
     setAccount(account);
   }
 
-  async function connectWithPaperWallet() {
-    try {
-      await socialLogin().then((user) => {
-        console.log("Users wallet address is: ", user.walletAddress); 
-        if (UserStatus.LOGGED_IN_WALLET_INITIALIZED === user.status) {
-          setUser();
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  async function logout() {
-    try {
-      await socialLogout().then(() => {
-        setUser();
-      });
-    } catch (error) {
-      console.log(error);
-    };
-  }
-
-  async function setUser() {
-    try {
-      await getUser().then((user) => {
-        if (user.status === UserStatus.LOGGED_OUT) {
-          console.log(`User not logged in!`)
-          toggleConnect(false);
-          updateUser(null);
-          updateAddress('0x');
-          return;
-        }
-        console.log(`User ${user.walletAddress} logged in!`)
-        updateUser(user);
-        setAccount(user.walletAddress);
-        setWalletConnected(true); 
-        toggleConnect(true);
-        setPaperWallet(true); 
-      })
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  // const loadBlockchainData = async () => {
-  //   if (updateUser !== undefined) {
-  //     console.log("Signed using paper wallet!")
-  //   } else {
-  //     console.log("Signed using normal wallet!"); 
-  //   }
-  // }
-
   useEffect( () => {
     // setUser();
     async () => {
@@ -86,6 +48,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
   }, [currentUser]);
 
   return (
+    <WagmiConfig client={client}>
     <nav className={`navbar ${isDarkMode ? "dark" : "light"}`}>
       <div className="navbar-container">
 
@@ -97,16 +60,20 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
         <div className='end-container'>
           <div className="button-container">
             { 
-              account ? (
+              account || isConnected ? (
                 <button 
                   className="connect-button"
                 >
-                  {account.slice(0,6) }...{ account.slice(38,42)}
+                  {
+                    account ? account.slice(0,6) + "..." + account.slice(38,42) :  
+                    address.slice(0,6) + "..." + address.slice(38,42) 
+                  }
+                  {/* {account.slice(0,6) }...{ account.slice(38,42)} */}
                 </button>
               ) : (
                 <button 
                   className="connect-button"
-                  onClick={connectWithPaperWallet}
+                  onClick={handleOpen}
                 >
                   Connect Wallet
                 </button>
@@ -121,6 +88,7 @@ const Navbar = ({ account, walletConnected, setAccount, isDarkMode, handleToggle
 
       </div>
     </nav>
+    </WagmiConfig>
   )
 }
 
