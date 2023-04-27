@@ -8,7 +8,20 @@ import { abi as contractAbi } from '../abi/DecentDisc.json';
 import { abi as tokenAbi } from "../abi/DecentDiscToken.json"; 
 import config from '../config.json';
 import { io } from 'socket.io-client';
-// require("dotenv").config();
+import { WagmiConfig, createClient, configureChains, mainnet} from 'wagmi'
+import { polygonMumbai } from 'wagmi/chains'
+ 
+import { alchemyProvider } from 'wagmi/providers/alchemy'
+import { publicProvider } from 'wagmi/providers/public'
+ 
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import WagmiWallet from '../components/WagmiWallet';
+
+import { socialLogin, socialLogout, getUser } from "../src/paper.js";
+import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
 
 const socket = io('http://localhost:3030'); 
 
@@ -16,12 +29,11 @@ const socket = io('http://localhost:3030');
 const PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Hardhat node wallet address **DO NOT SEND FUNDS!
 const rpcProvider = "http://localhost:8545"; 
 
-
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false); 
   const [account, setAccount] = useState(); 
   const {walletConnected, setWalletConnected} = useState(false); 
-  const [provider, setProvider] = useState(); 
+  const [normalProvider, setProvider] = useState(); 
   const [decentDiscProvider, setDecentDiscProvider] = useState(); 
   const [decentDiscSigner, setDecentDiscSigner] = useState(); 
   const [decentDiscToken, setDecentDiscToken] = useState(); 
@@ -35,7 +47,90 @@ function App() {
   const [channelCreators, setChannelCreators] = useState([]); 
   const [paperWallet, setPaperWallet] = useState(false); 
   const [currentUser, updateUser] = useState(null);
-  // const [config, setConfig] = useState(null); 
+  const [isOpen, setIsOpen] = useState(false);
+  const [connected, toggleConnect] = useState(false);
+
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
+  // WAGMI WALLET CONNECTION 
+  const { chains, provider , webSocketProvider } = configureChains(
+    [polygonMumbai],
+    [alchemyProvider({ apiKey: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" }), publicProvider()],
+  )
+
+  const client = createClient({
+    autoConnect: true,
+    connectors: [
+      new MetaMaskConnector({ chains }),
+      new CoinbaseWalletConnector({
+        chains,
+        options: {
+          appName: 'Decentralized Discord',
+        },
+      }),
+      new WalletConnectConnector({
+        chains,
+        options: {
+          projectId: 'Decentralized Discord',
+        },
+      }),
+    ],
+    provider,
+    webSocketProvider,
+  })
+
+  // PAPER WALLET CONNECTION 
+  async function connectWithPaperWallet() {
+    try {
+      await socialLogin().then((user) => {
+        console.log("Users wallet address is: ", user.walletAddress); 
+        if (UserStatus.LOGGED_IN_WALLET_INITIALIZED === user.status) {
+          setUser();
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function logout() {
+    try {
+      await socialLogout().then(() => {
+        setUser();
+      });
+    } catch (error) {
+      console.log(error);
+    };
+  }
+
+  async function setUser() {
+    try {
+      await getUser().then((user) => {
+        if (user.status === UserStatus.LOGGED_OUT) {
+          console.log(`User not logged in!`)
+          toggleConnect(false);
+          updateUser(null);
+          updateAddress('0x');
+          return;
+        }
+        console.log(`User ${user.walletAddress} logged in!`)
+        updateUser(user);
+        setAccount(user.walletAddress);
+        setWalletConnected(true); 
+        toggleConnect(true);
+        setPaperWallet(true); 
+      })
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  // END OF PAPER WALLET CONNECTION
 
 
   const handleToggleDarkMode = () => {
@@ -101,7 +196,7 @@ function App() {
         return ethers.utils.parseUnits(n.toString(), "ether")
       } 
 
-      const network = await provider.getNetwork(); 
+      const network = await normalProvider.getNetwork(); 
 
       const provider2 = new ethers.providers.JsonRpcProvider(rpcProvider);
       const wallet = new ethers.Wallet(PRIVATE_KEY, provider2);
@@ -210,55 +305,67 @@ function App() {
   }, [account])
 
   return (
-    <div className="App">
-      <Navbar 
-        account={account} 
-        walletConnected={walletConnected} 
-        setWalletConnected={setWalletConnected} 
-        setAccount={setAccount} 
-        isDarkMode={isDarkMode} 
-        setIsDarkMode={setIsDarkMode} 
-        handleToggleDarkMode={handleToggleDarkMode}
-        paperWallet={paperWallet}
-        setPaperWallet={setPaperWallet}
-        currentUser={currentUser} 
-        updateUser={updateUser}
-      /> 
-      
-      <main className={`${isDarkMode ? "dark" : " "}`}>
-        <Server 
+    <WagmiConfig client={client}>
+      <div className="App">
+        <WagmiWallet 
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          handleOpen={handleOpen}
+          handleClose={handleClose}
+          handleSignUpWithEmail={connectWithPaperWallet}
+        />
+        <Navbar 
+          account={account} 
+          walletConnected={walletConnected} 
+          setWalletConnected={setWalletConnected} 
+          setAccount={setAccount} 
+          isDarkMode={isDarkMode} 
+          setIsDarkMode={setIsDarkMode} 
           handleToggleDarkMode={handleToggleDarkMode}
+          paperWallet={paperWallet}
+          setPaperWallet={setPaperWallet}
+          currentUser={currentUser} 
+          updateUser={updateUser}
+          handleOpen={handleOpen}
         /> 
+        
+        <main className={`${isDarkMode ? "dark" : " "}`}>
+          <Server 
+            handleToggleDarkMode={handleToggleDarkMode}
+          /> 
 
-        <Channel 
-          handleToggleDarkMode={handleToggleDarkMode}
-          provider={provider}
-          account={account}
-          decentDisc={decentDiscProvider}
-          channels={channels}
-          currentChannel={currentChannel}
-          setCurrentChannel={setCurrentChannel}
-        /> 
+          <Channel 
+            handleToggleDarkMode={handleToggleDarkMode}
+            provider={normalProvider}
+            account={account}
+            decentDisc={decentDiscProvider}
+            channels={channels}
+            currentChannel={currentChannel}
+            setCurrentChannel={setCurrentChannel}
+          /> 
 
-        <Messages 
-          handleToggleDarkMode={handleToggleDarkMode}
-          account={account}
-          messages={messages} 
-          currentChannel={currentChannel}
-          accountsWithMorePoints={accountsWithMorePoints}
-          accountsSentMessages={accountsSentMessages}
-          newAccountPoints={newAccountPoints}
-          setNewAccountPoints={setNewAccountPoints}
-          channelCreators={channelCreators}
-          setChannelCreators={setChannelCreators}
-        /> 
-      </main>
+          <Messages 
+            handleToggleDarkMode={handleToggleDarkMode}
+            account={account}
+            messages={messages} 
+            currentChannel={currentChannel}
+            accountsWithMorePoints={accountsWithMorePoints}
+            accountsSentMessages={accountsSentMessages}
+            newAccountPoints={newAccountPoints}
+            setNewAccountPoints={setNewAccountPoints}
+            channelCreators={channelCreators}
+            setChannelCreators={setChannelCreators}
+          /> 
+        </main>
 
-      <button onClick={sendTokens}>
-        Send tokens
-      </button>
+        {/* <button onClick={sendTokens}>
+          Send tokens
+        </button> */}
 
-    </div>
+        <button onClick={handleOpen}>Open Wallet Provider Modal</button>
+
+      </div>
+    </WagmiConfig>
   )
 }
 
