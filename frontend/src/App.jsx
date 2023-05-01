@@ -19,9 +19,7 @@ import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import WagmiWallet from '../components/WagmiWallet';
-
-import { socialLogin, socialLogout, getUser } from "../src/paper.js";
-import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
+import { connectWithPaperWallet } from '../components/WalletConnection/SignInEmail';
 
 // import {
 //   useAccount,
@@ -57,6 +55,7 @@ function App() {
   const [currentUser, updateUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [connected, toggleConnect] = useState(false);
+  const [signedUpWithEmail, setSignedUpWithEmail] = useState(false); 
 
   // const { disconnect  = useDisconnect()
   // console.log("UseDisconnect: ", useDisconnect())
@@ -105,50 +104,50 @@ function App() {
   }
 
   // PAPER WALLET CONNECTION 
-  async function connectWithPaperWallet() {
-    try {
-      await socialLogin().then((user) => {
-        console.log("Users wallet address is: ", user.walletAddress); 
-        if (UserStatus.LOGGED_IN_WALLET_INITIALIZED === user.status) {
-          setUser();
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  // async function connectWithPaperWallet() {
+  //   try {
+  //     await socialLogin().then((user) => {
+  //       console.log("Users wallet address is: ", user.walletAddress); 
+  //       if (UserStatus.LOGGED_IN_WALLET_INITIALIZED === user.status) {
+  //         setUser();
+  //       }
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
-  async function logout() {
-    try {
-      await socialLogout().then(() => {
-        setUser();
-      });
-    } catch (error) {
-      console.log(error);
-    };
-  }
+  // async function logout() {
+  //   try {
+  //     await socialLogout().then(() => {
+  //       setUser();
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   };
+  // }
 
-  async function setUser() {
-    try {
-      await getUser().then((user) => {
-        if (user.status === UserStatus.LOGGED_OUT) {
-          console.log(`User not logged in!`)
-          toggleConnect(false);
-          updateUser(null);
-          updateAddress('0x');
-          return;
-        }
-        console.log(`User ${user.walletAddress} logged in!`)
-        updateUser(user);
-        setAccount(user.walletAddress);
-        setWalletConnected(true); 
-        toggleConnect(true);
-        setPaperWallet(true); 
-      })
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // async function setUser() {
+  //   try {
+  //     await getUser().then((user) => {
+  //       if (user.status === UserStatus.LOGGED_OUT) {
+  //         console.log(`User not logged in!`)
+  //         toggleConnect(false);
+  //         updateUser(null);
+  //         updateAddress('0x');
+  //         return;
+  //       }
+  //       console.log(`User ${user.walletAddress} logged in!`)
+  //       updateUser(user);
+  //       setAccount(user.walletAddress);
+  //       setWalletConnected(true); 
+  //       toggleConnect(true);
+  //       setPaperWallet(true); 
+  //     })
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
   // END OF PAPER WALLET CONNECTION
 
 
@@ -331,7 +330,9 @@ function App() {
           setIsOpen={setIsOpen}
           handleOpen={handleOpen}
           handleClose={handleClose}
-          handleSignUpWithEmail={connectWithPaperWallet}
+          // handleSignUpWithEmail={connectWithPaperWallet}
+          setAccount={setAccount}
+          setSignedUpWithEmail={setSignedUpWithEmail}
         />
         <Navbar 
           account={account} 

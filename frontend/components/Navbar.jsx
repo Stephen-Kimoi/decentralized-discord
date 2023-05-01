@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import { ethers } from "ethers";
 
-import { socialLogin, socialLogout, getUser } from "../src/paper.js";
+// import { socialLogin, socialLogout, getUser } from "../src/paper.js";
 
-import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
-
+// import { UserStatus } from "@paperxyz/embedded-wallet-service-sdk";
 
 const Navbar = ({ 
   account, 
@@ -24,7 +23,8 @@ const Navbar = ({
   isConnected, 
   address, 
   client, 
-  WagmiConfig }) => {
+  WagmiConfig,
+  setSignedUpWithEmail }) => {
   const [connected, toggleConnect] = useState(false);
   // const location = useLocation();
   // const [currentAddress, updateAddress] = useState('0x');
@@ -39,11 +39,11 @@ const Navbar = ({
 
   useEffect( () => {
     // setUser();
-    async () => {
-      await getUser().then((user) => {
-        console.log(`User ${user.walletAddress} connected`)
-      }); 
-    }
+    // async () => {
+    //   await getUser().then((user) => {
+    //     console.log(`User ${user.walletAddress} connected`)
+    //   }); 
+    // }
     // loadBlockchainData(); 
   }, [currentUser]);
 

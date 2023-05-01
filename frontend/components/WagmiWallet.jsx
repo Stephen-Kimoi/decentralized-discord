@@ -1,9 +1,23 @@
 import React from 'react'
 import { useConnect } from 'wagmi'
 import Modal from 'react-modal';
+import { connectWithPaperWallet } from './WalletConnection/SignInEmail';
 
-const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, handleSignUpWithEmail}) => {
+const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail }) => {
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
+    
+    const handleSignUpWithEmail = async () => {
+      try {
+        console.log(1234)
+        const connectedUserObj  = await connectWithPaperWallet();
+        setAccount(connectedUserObj.walletAddress); 
+        setSignedUpWithEmail(true);  
+        console.log("Wallet address: ", connectedUserObj.walletAddress); 
+      } catch (error){
+        
+      }
+    }
+
   return (
     // <div>
     //     {connectors.map((connector) => (
@@ -22,6 +36,7 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, handleSignUpW
     //   {error && <div>{error.message}</div>}
     // </div>
     <Modal isOpen={isOpen} onRequestClose={handleClose} style={modalStyles}>
+
         <h2 style={{ textAlign: 'center' }} >Choose the wallet provider you'd like to use</h2>
         <div>
           {connectors.map((connector) => (
