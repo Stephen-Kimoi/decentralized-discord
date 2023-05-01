@@ -34,15 +34,8 @@ import { client } from '../components/WalletConnection/WagmiWalletConnect';
 
 const socket = io('http://localhost:3030'); 
 
-// const PRIVATE_KEY = process.env.LOCALNETWORK_PRIVATE_KEY; 
-// const PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Hardhat node wallet address **DO NOT SEND FUNDS!
-// const rpcProvider = "http://localhost:8545"; 
-
 const testnetAccountPrivateKey = config.privateKey
 const alchemyRpcProvider = config.rpcProvider
-
-// const testnetAccountPrivateKey = "16442bdee903d858c681238757c84900b1868ccd7d58e2da7a00de7be51bfed1"
-// const alchemyRpcProvider =  "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" 
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false); 
