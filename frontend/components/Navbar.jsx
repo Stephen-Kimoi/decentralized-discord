@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import { ethers } from "ethers";
+import { useDisconnect } from "wagmi";
+import { logout } from "./WalletConnection/SignInEmail";
 
 // import { socialLogin, socialLogout, getUser } from "../src/paper.js";
 
@@ -24,8 +26,11 @@ const Navbar = ({
   address, 
   client, 
   WagmiConfig,
+  signedUpWithWagmi, 
+  signedUpWithEmail, 
   setSignedUpWithEmail }) => {
   const [connected, toggleConnect] = useState(false);
+  const { disconnect } = useDisconnect(); 
   // const location = useLocation();
   // const [currentAddress, updateAddress] = useState('0x');
   // const [currentUser, updateUser] = useState(null);
@@ -35,6 +40,27 @@ const Navbar = ({
     const account = ethers.utils.getAddress(accounts[0]); 
     console.log(account.slice(0, 6)); 
     setAccount(account);
+  }
+
+
+  const handleWagmiDisconnect = () => {
+    try {
+      disconnect(); 
+      console.log("Account disconnected!"); 
+    } catch (error){
+      console.error(error)
+    }
+  }
+
+  const handleEmailDisconnect = () => {
+    try {
+      logout(); 
+      setAccount(""); 
+      setSignedUpWithEmail(false); 
+      console.log("Email disconnect!")
+    } catch (error){
+      console.error(error)
+    }
   }
 
   useEffect( () => {
@@ -80,6 +106,22 @@ const Navbar = ({
               )
             }
           </div>
+
+          {
+            signedUpWithWagmi && (
+              <button className="node-toggle-button" onClick={handleWagmiDisconnect}>
+                Disconnect
+              </button>
+            )
+          }
+
+          {
+            signedUpWithEmail && (
+              <button className="node-toggle-button" onClick={handleEmailDisconnect}>
+                  Disconnect
+              </button>
+            )
+          }
         
           <button className='node-toggle-button' onClick={handleToggleDarkMode}>
               {isDarkMode ? "Light Mode" : "Dark Mode"}

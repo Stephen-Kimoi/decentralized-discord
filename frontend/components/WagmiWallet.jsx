@@ -2,19 +2,34 @@ import React from 'react'
 import { useConnect } from 'wagmi'
 import Modal from 'react-modal';
 import { connectWithPaperWallet } from './WalletConnection/SignInEmail';
+import { client  } from './WalletConnection/WagmiWalletConnect';
+import { useAccount } from 'wagmi';
 
-const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail }) => {
+
+const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail, setSignedUpWithWagmi }) => {
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
+
+    const wagmiClient = client; 
+    const { address, connector, isConnected } = useAccount(); 
     
     const handleSignUpWithEmail = async () => {
       try {
-        console.log(1234)
         const connectedUserObj  = await connectWithPaperWallet();
         setAccount(connectedUserObj.walletAddress); 
         setSignedUpWithEmail(true);  
         console.log("Wallet address: ", connectedUserObj.walletAddress); 
       } catch (error){
-        
+        console.error(error)
+      }
+    }
+
+    const handleSignUpWithWagmi = async (connector) => {
+      try {
+        connect(connector)
+        setSignedUpWithWagmi(true); 
+        console.log("useAccount: ", address)
+      } catch (error) {
+        console.error(error)
       }
     }
 
@@ -43,7 +58,8 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
             <button
               key={connector.id}
               disabled={!connector.ready}
-              onClick={() => connect({ connector })}
+              // onClick={() => connect({ connector })}
+              onClick={ () => handleSignUpWithWagmi(connector) }
               style={buttonStyle(connector)}
             >
               {connector.name}

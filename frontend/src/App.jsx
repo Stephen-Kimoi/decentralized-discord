@@ -21,6 +21,8 @@ import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import WagmiWallet from '../components/WagmiWallet';
 import { connectWithPaperWallet } from '../components/WalletConnection/SignInEmail';
 
+import { client } from '../components/WalletConnection/WagmiWalletConnect';
+
 // import {
 //   useAccount,
 //   useConnect,
@@ -56,6 +58,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [connected, toggleConnect] = useState(false);
   const [signedUpWithEmail, setSignedUpWithEmail] = useState(false); 
+  const [signedUpWithWagmi, setSignedUpWithWagmi] = useState(false); 
 
   // const { disconnect  = useDisconnect()
   // console.log("UseDisconnect: ", useDisconnect())
@@ -69,31 +72,31 @@ function App() {
   };
 
   // WAGMI WALLET CONNECTION 
-  const { chains, provider , webSocketProvider } = configureChains(
-    [polygonMumbai],
-    [alchemyProvider({ apiKey: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" }), publicProvider()],
-  )
+  // const { chains, provider , webSocketProvider } = configureChains(
+  //   [polygonMumbai],
+  //   [alchemyProvider({ apiKey: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" }), publicProvider()],
+  // )
 
-  const client = createClient({
-    autoConnect: true,
-    connectors: [
-      new MetaMaskConnector({ chains }),
-      new CoinbaseWalletConnector({
-        chains,
-        options: {
-          appName: 'Decentralized Discord',
-        },
-      }),
-      new WalletConnectConnector({
-        chains,
-        options: {
-          projectId: 'Decentralized Discord',
-        },
-      }),
-    ],
-    provider,
-    webSocketProvider,
-  })
+  // const client = createClient({
+  //   autoConnect: true,
+  //   connectors: [
+  //     new MetaMaskConnector({ chains }),
+  //     new CoinbaseWalletConnector({
+  //       chains,
+  //       options: {
+  //         appName: 'Decentralized Discord',
+  //       },
+  //     }),
+  //     new WalletConnectConnector({
+  //       chains,
+  //       options: {
+  //         projectId: 'Decentralized Discord',
+  //       },
+  //     }),
+  //   ],
+  //   provider,
+  //   webSocketProvider,
+  // })
 
   const { address, connector, isConnected } = useAccount(); 
   
@@ -102,53 +105,6 @@ function App() {
   } else {
     console.log("Address absent")
   }
-
-  // PAPER WALLET CONNECTION 
-  // async function connectWithPaperWallet() {
-  //   try {
-  //     await socialLogin().then((user) => {
-  //       console.log("Users wallet address is: ", user.walletAddress); 
-  //       if (UserStatus.LOGGED_IN_WALLET_INITIALIZED === user.status) {
-  //         setUser();
-  //       }
-  //     });
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
-
-  // async function logout() {
-  //   try {
-  //     await socialLogout().then(() => {
-  //       setUser();
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   };
-  // }
-
-  // async function setUser() {
-  //   try {
-  //     await getUser().then((user) => {
-  //       if (user.status === UserStatus.LOGGED_OUT) {
-  //         console.log(`User not logged in!`)
-  //         toggleConnect(false);
-  //         updateUser(null);
-  //         updateAddress('0x');
-  //         return;
-  //       }
-  //       console.log(`User ${user.walletAddress} logged in!`)
-  //       updateUser(user);
-  //       setAccount(user.walletAddress);
-  //       setWalletConnected(true); 
-  //       toggleConnect(true);
-  //       setPaperWallet(true); 
-  //     })
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-  // END OF PAPER WALLET CONNECTION
 
 
   const handleToggleDarkMode = () => {
@@ -333,6 +289,7 @@ function App() {
           // handleSignUpWithEmail={connectWithPaperWallet}
           setAccount={setAccount}
           setSignedUpWithEmail={setSignedUpWithEmail}
+          setSignedUpWithWagmi={setSignedUpWithWagmi}
         />
         <Navbar 
           account={account} 
@@ -351,6 +308,9 @@ function App() {
           address={address}
           client={client}
           WagmiConfig={WagmiConfig}
+          signedUpWithWagmi={signedUpWithWagmi}
+          signedUpWithEmail={signedUpWithEmail}
+          setSignedUpWithEmail={setSignedUpWithEmail}
         /> 
         
         <main className={`${isDarkMode ? "dark" : " "}`}>

@@ -19,7 +19,7 @@ export async function connectWithPaperWallet() {
     return connectedUserObj;
   }
 
-  async function logout() {
+  export async function logout() {
     try {
       await socialLogout().then(() => {
         setUser();
@@ -36,9 +36,9 @@ export async function connectWithPaperWallet() {
       await getUser().then((user) => {
         if (user.status === UserStatus.LOGGED_OUT) {
           console.log(`User not logged in!`)
-          toggleConnect(false);
-          updateUser(null);
-          updateAddress('0x');
+          // toggleConnect(false);
+          // updateUser(null);
+          // updateAddress('0x');
           return;
         }
         console.log(`User ${user.walletAddress} logged in!`)
