@@ -6,7 +6,8 @@ import Channel from '../components/Channel';
 import Messages from '../components/Messages';
 import { abi as contractAbi } from '../abi/DecentDisc.json'; 
 import { abi as tokenAbi } from "../abi/DecentDiscToken.json"; 
-import config from '../config.json';
+import constants from '../constants.json'
+import config from '../config';
 import { io } from 'socket.io-client';
 import { WagmiConfig, createClient, configureChains, mainnet,  useAccount, useDisconnect} from 'wagmi'
 import { polygonMumbai } from 'wagmi/chains'
@@ -34,14 +35,22 @@ import { client } from '../components/WalletConnection/WagmiWalletConnect';
 const socket = io('http://localhost:3030'); 
 
 // const PRIVATE_KEY = process.env.LOCALNETWORK_PRIVATE_KEY; 
-const PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Hardhat node wallet address **DO NOT SEND FUNDS!
-const rpcProvider = "http://localhost:8545"; 
+// const PRIVATE_KEY = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"; // Hardhat node wallet address **DO NOT SEND FUNDS!
+// const rpcProvider = "http://localhost:8545"; 
+
+const testnetAccountPrivateKey = config.privateKey
+const alchemyRpcProvider = config.rpcProvider
+
+// const testnetAccountPrivateKey = "16442bdee903d858c681238757c84900b1868ccd7d58e2da7a00de7be51bfed1"
+// const alchemyRpcProvider =  "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" 
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false); 
   const [account, setAccount] = useState(); 
   const {walletConnected, setWalletConnected} = useState(false); 
   const [normalProvider, setProvider] = useState(); 
+  const [emailSigner, setEmailSigner] = useState(); 
+  const [gaslessContractCall, setGaslessContractCall] = useState(); 
   const [decentDiscProvider, setDecentDiscProvider] = useState(); 
   const [decentDiscSigner, setDecentDiscSigner] = useState(); 
   const [decentDiscToken, setDecentDiscToken] = useState(); 
@@ -60,9 +69,6 @@ function App() {
   const [signedUpWithEmail, setSignedUpWithEmail] = useState(false); 
   const [signedUpWithWagmi, setSignedUpWithWagmi] = useState(false); 
 
-  // const { disconnect  = useDisconnect()
-  // console.log("UseDisconnect: ", useDisconnect())
-
   const handleOpen = () => {
     setIsOpen(true);
   };
@@ -71,40 +77,13 @@ function App() {
     setIsOpen(false);
   };
 
-  // WAGMI WALLET CONNECTION 
-  // const { chains, provider , webSocketProvider } = configureChains(
-  //   [polygonMumbai],
-  //   [alchemyProvider({ apiKey: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" }), publicProvider()],
-  // )
-
-  // const client = createClient({
-  //   autoConnect: true,
-  //   connectors: [
-  //     new MetaMaskConnector({ chains }),
-  //     new CoinbaseWalletConnector({
-  //       chains,
-  //       options: {
-  //         appName: 'Decentralized Discord',
-  //       },
-  //     }),
-  //     new WalletConnectConnector({
-  //       chains,
-  //       options: {
-  //         projectId: 'Decentralized Discord',
-  //       },
-  //     }),
-  //   ],
-  //   provider,
-  //   webSocketProvider,
-  // })
-
   const { address, connector, isConnected } = useAccount(); 
   
-  if(address){
-    console.log("Address is: ", address)
-  } else {
-    console.log("Address absent")
-  }
+  // if(address){
+  //   console.log("Address is: ", address)
+  // } else {
+  //   console.log("Address absent")
+  // }
 
 
   const handleToggleDarkMode = () => {
@@ -118,15 +97,25 @@ function App() {
     if (currentUser !== undefined) {
 
       const signer = await currentUser.wallet.getEthersJsSigner({
-        rpcEndpoint: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ", // REMOVE THIS
+        rpcEndpoint: alchemyRpcProvider, // REMOVE THIS
       });
 
-      decentDiscProvider = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, signer); 
+      setEmailSigner(signer); 
+
+      decentDiscProvider = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, signer); 
       setDecentDiscProvider(decentDiscProvider); 
 
       allChannels = await decentDiscProvider.channelNumbers(); 
 
       console.log(allChannels.toString());
+
+      // Set gasless transaction 
+      const provider2 = new ethers.providers.JsonRpcProvider(alchemyRpcProvider);
+      const wallet = new ethers.Wallet(testnetAccountPrivateKey, provider2);
+
+      const decentDiscGasless = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, wallet);
+      setGaslessContractCall(decentDiscGasless); 
+
     } else {
 
       const provider = new ethers.providers.Web3Provider(window.ethereum); 
@@ -135,13 +124,13 @@ function App() {
       const network = await provider.getNetwork(); 
       const signer = await provider.getSigner(); 
       
-      decentDiscProvider = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, provider);  
+      decentDiscProvider = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, provider);  
       // setDecentDiscProvider(decentDiscProvider); 
       
       // REMOVE THIS CODE
-      const decentDiscToken = new ethers.Contract(config[31337].DecentDiscToken.address, tokenAbi, provider);
+      const decentDiscToken = new ethers.Contract(constants[31337].DecentDiscToken.address, tokenAbi, provider);
       setDecentDiscToken(decentDiscToken); 
-      const decentDiscSigner = new ethers.Contract(config[31337].DecentDisc.address, contractAbi, signer);
+      const decentDiscSigner = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, signer);
       setDecentDiscSigner(decentDiscSigner); 
 
     }
@@ -164,37 +153,37 @@ function App() {
 
   } 
 
-  const sendTokens = async () => {
-    try {
-      const tokens = (n) => {
-        return ethers.utils.parseUnits(n.toString(), "ether")
-      } 
+  // const sendTokens = async () => {
+  //   try {
+  //     const tokens = (n) => {
+  //       return ethers.utils.parseUnits(n.toString(), "ether")
+  //     } 
 
-      const network = await normalProvider.getNetwork(); 
+  //     const network = await normalProvider.getNetwork(); 
 
-      const provider2 = new ethers.providers.JsonRpcProvider(rpcProvider);
-      const wallet = new ethers.Wallet(PRIVATE_KEY, provider2);
+  //     const provider2 = new ethers.providers.JsonRpcProvider(rpcProvider);
+  //     const wallet = new ethers.Wallet(PRIVATE_KEY, provider2);
       
-      const decentDiscToken = new ethers.Contract(config[network.chainId].DecentDiscToken.address, tokenAbi, wallet);
+  //     const decentDiscToken = new ethers.Contract(constants[network.chainId].DecentDiscToken.address, tokenAbi, wallet);
 
-      const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, wallet);
+  //     const decentDisc = new ethers.Contract(config[network.chainId].DecentDisc.address, contractAbi, wallet);
 
-      const contractBalance = await decentDiscToken.balanceOf(decentDisc.address); 
-      console.log("Contract balance: ", contractBalance.toString()); 
+  //     const contractBalance = await decentDiscToken.balanceOf(decentDisc.address); 
+  //     console.log("Contract balance: ", contractBalance.toString()); 
 
-      const addressBalanceBefore = await decentDiscToken.balanceOf(account);
-      console.log(`Address balance of ${account} before sending tokens is ${addressBalanceBefore}`);
+  //     const addressBalanceBefore = await decentDiscToken.balanceOf(account);
+  //     console.log(`Address balance of ${account} before sending tokens is ${addressBalanceBefore}`);
 
-      let tx = await decentDisc.sendTokens(account, tokens(1), { gasLimit: 1000000 });
-      await tx.wait(); 
+  //     let tx = await decentDisc.sendTokens(account, tokens(1), { gasLimit: 1000000 });
+  //     await tx.wait(); 
 
-      const addressBalance = await decentDiscToken.balanceOf(account); 
-      console.log(`Address balance of ${account} after: `, addressBalance.toString()); 
+  //     const addressBalance = await decentDiscToken.balanceOf(account); 
+  //     console.log(`Address balance of ${account} after: `, addressBalance.toString()); 
 
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   const updateAccounts = (messages) => {
     const updatedAccounts = accountPoints.map((account) => {
@@ -209,31 +198,31 @@ function App() {
     setNewAccountPoints(updatedAccounts); 
   }
 
-  const checkAccountPoints = async () => {
-    // ERROR IN FETCHING CONFIG FROM API 
-    // fetch('/api/config')
-    //   .then(response => response.json())
-    //   .then(data => { setConfig(data); console.log('Data from fetch: ', data)} )
+  // const checkAccountPoints = async () => {
+  //   // ERROR IN FETCHING CONFIG FROM API 
+  //   // fetch('/api/config')
+  //   //   .then(response => response.json())
+  //   //   .then(data => { setConfig(data); console.log('Data from fetch: ', data)} )
 
-    try {
-      newAccountPoints.forEach((account) => {
+  //   try {
+  //     newAccountPoints.forEach((account) => {
 
-        if (account.points > 3){
-          console.log('Account with more points: ', account.account)
-          setAccountsWithMorePoints(prev => [...prev, account.account]); // Over here 
-          // sendTokens(account.account)
-        } else {
-          console.log(`${account.account} please contribute to the channel to get more points`)
-        }
+  //       if (account.points > 3){
+  //         console.log('Account with more points: ', account.account)
+  //         setAccountsWithMorePoints(prev => [...prev, account.account]); // Over here 
+  //         // sendTokens(account.account)
+  //       } else {
+  //         console.log(`${account.account} please contribute to the channel to get more points`)
+  //       }
 
-      });
+  //     });
 
-      // console.log("Accounts that have sent messages: ", accountsSentMessages); 
+  //     // console.log("Accounts that have sent messages: ", accountsSentMessages); 
 
-    } catch (error) {
-      console.error(error); 
-    }
-  }
+  //   } catch (error) {
+  //     console.error(error); 
+  //   }
+  // }
 
   useEffect( () => {
     loadBlockchainData(); 
@@ -290,6 +279,7 @@ function App() {
           setAccount={setAccount}
           setSignedUpWithEmail={setSignedUpWithEmail}
           setSignedUpWithWagmi={setSignedUpWithWagmi}
+          setCurrentUser={updateUser}
         />
         <Navbar 
           account={account} 
@@ -326,6 +316,8 @@ function App() {
             channels={channels}
             currentChannel={currentChannel}
             setCurrentChannel={setCurrentChannel}
+            emailSigner={emailSigner}
+            gaslessContractCall={gaslessContractCall}
           /> 
 
           <Messages 

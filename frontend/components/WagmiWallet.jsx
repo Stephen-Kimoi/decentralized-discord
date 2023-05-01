@@ -6,7 +6,7 @@ import { client  } from './WalletConnection/WagmiWalletConnect';
 import { useAccount } from 'wagmi';
 
 
-const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail, setSignedUpWithWagmi }) => {
+const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail, setSignedUpWithWagmi, setCurrentUser }) => {
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
 
     const wagmiClient = client; 
@@ -16,6 +16,7 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
       try {
         const connectedUserObj  = await connectWithPaperWallet();
         setAccount(connectedUserObj.walletAddress); 
+        setCurrentUser(connectedUserObj); 
         setSignedUpWithEmail(true);  
         console.log("Wallet address: ", connectedUserObj.walletAddress); 
       } catch (error){

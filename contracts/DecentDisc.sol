@@ -32,15 +32,15 @@ contract DecentDisc is ERC721 {
         _; 
     }
 
-    function mint(uint256 id) public payable {
+    function mint(uint256 id, address msgSender) public payable {
         require(id != 0); 
         require(id <= channelNo); 
-        require(joinedChannel[id][msg.sender] == false); 
+        require(joinedChannel[id][msgSender] == false); 
         require(msg.value >= channels[id].cost); 
 
-       joinedChannel[id][msg.sender] = true; 
+       joinedChannel[id][msgSender] = true; 
        mintedNFTs++; 
-       _safeMint(msg.sender, mintedNFTs); 
+       _safeMint(msgSender, mintedNFTs); 
     }
 
     function createChannel(string memory name, uint256 cost) public onlyOwner {
