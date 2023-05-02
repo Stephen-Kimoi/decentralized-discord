@@ -108,7 +108,7 @@ const Navbar = ({
           </div>
 
           {
-            signedUpWithWagmi && (
+            signedUpWithWagmi  && (
               <button className="node-toggle-button" onClick={handleWagmiDisconnect}>
                 Disconnect
               </button>

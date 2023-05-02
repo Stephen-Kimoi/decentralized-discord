@@ -8,10 +8,13 @@ import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import config from '../../config'
+
+const alchemyRpcProvider = config.rpcProvider; 
 
 const { chains, provider , webSocketProvider } = configureChains(
     [polygonMumbai],
-    [alchemyProvider({ apiKey: "https://polygon-mumbai.g.alchemy.com/v2/69ry0asPLc51jW8BjQR0YcAK7L7Rg5TZ" }), publicProvider()],
+    [alchemyProvider({ apiKey: alchemyRpcProvider }), publicProvider()],
   )
 
 export const client = createClient({

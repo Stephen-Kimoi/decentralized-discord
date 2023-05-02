@@ -1,9 +1,8 @@
-import React from 'react'
-import { useConnect } from 'wagmi'
+import React, { useEffect } from 'react'
 import Modal from 'react-modal';
 import { connectWithPaperWallet } from './WalletConnection/SignInEmail';
 import { client  } from './WalletConnection/WagmiWalletConnect';
-import { useAccount } from 'wagmi';
+import { useAccount, useConnect } from 'wagmi';
 
 
 const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail, setSignedUpWithWagmi, setCurrentUser }) => {
@@ -28,11 +27,22 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
       try {
         connect(connector)
         setSignedUpWithWagmi(true); 
-        console.log("useAccount: ", address)
       } catch (error) {
         console.error(error)
       }
     }
+
+    useEffect(() => {
+      if (address) {
+        console.log("Account connected!: ", address)
+        setSignedUpWithWagmi(true)
+        setAccount(address); 
+      } else if (address == undefined){
+        console.log("Account disconnected!")
+        setSignedUpWithWagmi(false)
+        setAccount(""); 
+      }
+    }, [address])
 
   return (
     // <div>
@@ -52,7 +62,6 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
     //   {error && <div>{error.message}</div>}
     // </div>
     <Modal isOpen={isOpen} onRequestClose={handleClose} style={modalStyles}>
-
         <h2 style={{ textAlign: 'center' }} >Choose the wallet provider you'd like to use</h2>
         <div>
           {connectors.map((connector) => (
@@ -60,7 +69,7 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
               key={connector.id}
               disabled={!connector.ready}
               // onClick={() => connect({ connector })}
-              onClick={ () => handleSignUpWithWagmi(connector) }
+              onClick={ () => handleSignUpWithWagmi({ connector }) }
               style={buttonStyle(connector)}
             >
               {connector.name}

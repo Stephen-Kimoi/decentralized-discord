@@ -25,7 +25,7 @@ const main = async () => {
   console.log('Deployer address: ', owner); 
 
   const channel_names = ["Intro", "General", "Showcase"]; 
-  const cost = [tokens(0), tokens(1), tokens(2.5)]
+  const cost = [tokens(0), tokens(0.00004), tokens(0.00002)]
   
   for(let i = 0; i < 3; i++){ 
     const tx = await decentDisc.connect(deployer).createChannel(channel_names[i], cost[i])
@@ -48,9 +48,14 @@ const runMain = async () => {
 runMain();
 
 // POLYGON MUMBAI DEPLOY 
+// Decent Disc contract address:  0xF19874a8226CF7aD444D60F80Ed382A72e5a4d9B
+// Token contract address:  0x51AeCDFEd1c69A6cC45925bFcf7b2697a06e2551
+// Deployer address:  0x13Ef924EB7408e90278B86b659960AFb00DDae61
+
 // Decent Disc contract address:  0xfb3a31A7A8f0b2B125358cDa447Ff7108aCA49EC
 // Token contract address:  0x324889eF709Bd3F8583857c9509C994007765393
 // Deployer address:  0x13Ef924EB7408e90278B86b659960AFb00DDae61
+
 
 // Decent Disc contract address:  0x4C18d3a1B249d363916055759020ed2672ed8dcE
 // Token contract address:  0x1ad9d4269E0Ce5b4c30483244c261F31fbD5b6f5

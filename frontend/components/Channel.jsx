@@ -11,7 +11,6 @@ const Channel = ({provider, account, channels, decentDisc, currentChannel, setCu
       setCurrentChannel(channel)
     } else {
       console.log("Mnting NFT for joining channel..."); 
-      console.log("Gasless contract call: ", gaslessContractCall); 
       // const signer = await provider.getSigner(); 
       const tx = await gaslessContractCall.mint(channel.id, account, {value: channel.cost});
       await tx.wait();
