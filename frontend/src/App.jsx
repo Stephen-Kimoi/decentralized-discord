@@ -87,8 +87,7 @@ function App() {
     let decentDiscProvider; 
     let allChannels;
 
-    if (currentUser !== undefined) {
-
+    if (currentUser !== null) {
       const signer = await currentUser.wallet.getEthersJsSigner({
         rpcEndpoint: alchemyRpcProvider, // REMOVE THIS
       });
@@ -110,7 +109,7 @@ function App() {
       setGaslessContractCall(decentDiscGasless); 
 
     } else {
-
+      console.log("COde is here lalalal!")
       const provider = new ethers.providers.Web3Provider(window.ethereum); 
       setProvider(provider); 
       
@@ -119,6 +118,13 @@ function App() {
       
       decentDiscProvider = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, provider);  
       // setDecentDiscProvider(decentDiscProvider); 
+      
+      // Set gasless transaction 
+      const provider2 = new ethers.providers.JsonRpcProvider(alchemyRpcProvider);
+      const wallet = new ethers.Wallet(testnetAccountPrivateKey, provider2);
+
+      const decentDiscGasless = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, wallet);
+      setGaslessContractCall(decentDiscGasless); 
       
       // REMOVE THIS CODE
       const decentDiscToken = new ethers.Contract(constants[31337].DecentDiscToken.address, tokenAbi, provider);
