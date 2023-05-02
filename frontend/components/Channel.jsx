@@ -1,7 +1,7 @@
 import React from 'react'
 import './styles/Channel.css'
 
-const Channel = ({provider, account, channels, decentDisc, currentChannel, setCurrentChannel, emailSigner, gaslessContractCall}) => {
+const Channel = ({provider, account, channels, decentDisc, currentChannel, setCurrentChannel, gaslessContractCall}) => {
 
   const channelHandler = async (channel) => {
     const joinedChannel = await decentDisc.joinedChannel(channel.id, account); 
