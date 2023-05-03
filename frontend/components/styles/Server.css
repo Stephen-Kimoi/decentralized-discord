@@ -31,15 +31,19 @@
   }
   
   .server img {
-    width: 50%;
-    height: 50%;
+    width: 30%;
+    height: 30%;
   }
 
 @media (max-width: 768px) {
     .server {
+        display: none;
         width: 100%;
         min-width: auto;
         margin: 0;
         margin-top: 20px;
+    }
+    .server img {
+      width: 10%;
     }
 }

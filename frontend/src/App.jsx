@@ -14,7 +14,7 @@ import WagmiWallet from '../components/WagmiWallet';
 import { client } from '../components/WalletConnection/WagmiWalletConnect';
 import LoadingModal from '../components/Loading/Loading';
 
-const socket = io('http://localhost:3030'); 
+const socket = io('https://decentralized-discord-server-wh1z.onrender.com/'); 
 
 const testnetAccountPrivateKey = config.privateKey
 const alchemyRpcProvider = config.rpcProvider
@@ -147,10 +147,8 @@ function App() {
 
   useEffect( () => {
     if (account !== null){
-      console.log(loading)
       setLoading(false); 
-      console.log("Account null!")
-      // loadBlockchainData();
+      loadBlockchainData();
     } 
     // checkAccountPoints(); 
 
@@ -237,7 +235,7 @@ function App() {
           setSignedUpWithEmail={setSignedUpWithEmail}
         /> 
         
-        {/* <main className={`${isDarkMode ? "dark" : " "}`}>
+        <main className={`${isDarkMode ? "dark" : " "}`}>
           <Server 
             handleToggleDarkMode={handleToggleDarkMode}
           /> 
@@ -269,7 +267,7 @@ function App() {
             channelCreators={channelCreators}
             setChannelCreators={setChannelCreators}
           /> 
-        </main> */}
+        </main>
 
         {/* <button onClick={sendTokens}>
           Send tokens
