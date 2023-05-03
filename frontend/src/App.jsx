@@ -12,6 +12,7 @@ import { io } from 'socket.io-client';
 import { WagmiConfig, useAccount } from 'wagmi'
 import WagmiWallet from '../components/WagmiWallet';
 import { client } from '../components/WalletConnection/WagmiWalletConnect';
+import LoadingModal from '../components/Loading/Loading';
 
 const socket = io('http://localhost:3030'); 
 
@@ -20,7 +21,7 @@ const alchemyRpcProvider = config.rpcProvider
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(false); 
-  const [account, setAccount] = useState(); 
+  const [account, setAccount] = useState(null); 
   const {walletConnected, setWalletConnected} = useState(false); 
   const [normalProvider, setProvider] = useState(); 
   // const [emailSigner, setEmailSigner] = useState(); 
@@ -42,6 +43,11 @@ function App() {
   // const [connected, toggleConnect] = useState(false);
   const [signedUpWithEmail, setSignedUpWithEmail] = useState(false); 
   const [signedUpWithWagmi, setSignedUpWithWagmi] = useState(false); 
+  const [loading, setLoading] = useState(false); 
+  const [loadingStatement, setLoadingStatement] = useState(""); 
+  const [success, setSuccess] = useState(false); 
+  const [error, setError] = useState(false); 
+
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -59,6 +65,8 @@ function App() {
   }
 
   const loadBlockchainData = async () => {
+    setLoading(true)
+    setLoadingStatement("Fetching available channels...")
     console.log("Loading data from blockchain...")
     let decentDiscProvider; 
     let allChannels;
@@ -81,6 +89,7 @@ function App() {
 
       const decentDiscGasless = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, wallet);
       setGaslessContractCall(decentDiscGasless); 
+      setLoading(false)
 
     } else {
       const provider = new ethers.providers.Web3Provider(window.ethereum); 
@@ -115,6 +124,7 @@ function App() {
     }
 
     setChannels(channels)
+    setLoading(false)
 
     window.ethereum.on('accountsChanged', function () {
       window.location.reload()
@@ -136,7 +146,12 @@ function App() {
   }
 
   useEffect( () => {
-    loadBlockchainData(); 
+    if (account !== null){
+      console.log(loading)
+      setLoading(false); 
+      console.log("Account null!")
+      // loadBlockchainData();
+    } 
     // checkAccountPoints(); 
 
     socket.on('connect', () => {
@@ -181,6 +196,12 @@ function App() {
   return (
     <WagmiConfig client={client}>
       <div className="App">
+        <LoadingModal 
+          loading={loading}
+          loadingStatement={loadingStatement}
+          success={success}
+          error={error}
+        />
         <WagmiWallet 
           isOpen={isOpen}
           setIsOpen={setIsOpen}
@@ -191,6 +212,8 @@ function App() {
           setSignedUpWithEmail={setSignedUpWithEmail}
           setSignedUpWithWagmi={setSignedUpWithWagmi}
           setCurrentUser={updateUser}
+          setLoading={setLoading}
+          setLoadingStatement={setLoadingStatement}
         />
         <Navbar 
           account={account} 
@@ -214,7 +237,7 @@ function App() {
           setSignedUpWithEmail={setSignedUpWithEmail}
         /> 
         
-        <main className={`${isDarkMode ? "dark" : " "}`}>
+        {/* <main className={`${isDarkMode ? "dark" : " "}`}>
           <Server 
             handleToggleDarkMode={handleToggleDarkMode}
           /> 
@@ -228,6 +251,10 @@ function App() {
             currentChannel={currentChannel}
             setCurrentChannel={setCurrentChannel}
             gaslessContractCall={gaslessContractCall}
+            setLoading={setLoading} 
+            setLoadingStatement={setLoadingStatement}
+            setError={setError}
+            setSuccess={setSuccess}
           /> 
 
           <Messages 
@@ -242,7 +269,7 @@ function App() {
             channelCreators={channelCreators}
             setChannelCreators={setChannelCreators}
           /> 
-        </main>
+        </main> */}
 
         {/* <button onClick={sendTokens}>
           Send tokens

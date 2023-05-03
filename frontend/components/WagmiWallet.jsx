@@ -5,7 +5,7 @@ import { client  } from './WalletConnection/WagmiWalletConnect';
 import { useAccount, useConnect } from 'wagmi';
 
 
-const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail, setSignedUpWithWagmi, setCurrentUser }) => {
+const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, setSignedUpWithEmail, setSignedUpWithWagmi, setCurrentUser, setLoading, setLoadingStatement }) => {
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
 
     const wagmiClient = client; 
@@ -18,6 +18,7 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
         setCurrentUser(connectedUserObj); 
         setSignedUpWithEmail(true);  
         console.log("Wallet address: ", connectedUserObj.walletAddress); 
+        handleClose(); 
       } catch (error){
         console.error(error)
       }
@@ -27,6 +28,7 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
       try {
         connect(connector)
         setSignedUpWithWagmi(true); 
+        handleClose(); 
       } catch (error) {
         console.error(error)
       }
@@ -45,25 +47,9 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
     }, [address])
 
   return (
-    // <div>
-    //     {connectors.map((connector) => (
-    //     <button
-    //       disabled={!connector.ready}
-    //       key={connector.id}
-    //       onClick={() => connect({ connector })}
-    //     >
-    //       {connector.name}
-    //       {!connector.ready && ' (unsupported)'}
-    //       {isLoading &&
-    //         connector.id === pendingConnector?.id &&
-    //         ' (connecting)'}
-    //     </button>
-    //   ))}
-    //   {error && <div>{error.message}</div>}
-    // </div>
     <Modal isOpen={isOpen} onRequestClose={handleClose} style={modalStyles}>
-        <h2 style={{ textAlign: 'center' }} >Choose the wallet provider you'd like to use</h2>
-        <div>
+        <h2 style={{ textAlign: 'center', color: 'black', paddingBottom: '30px' }} >Choose the wallet provider you would like to use</h2>
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
           {connectors.map((connector) => (
             <button
               key={connector.id}
@@ -81,7 +67,7 @@ const WagmiWallet = ({ isOpen, setIsOpen, handleOpen, handleClose, setAccount, s
           ))}
           <button
             onClick={handleSignUpWithEmail}
-            style={{ backgroundColor: '', color: 'black', cursor: 'pointer', margin: '0 auto' }}
+            style={{ backgroundColor: '', color: 'black', cursor: 'pointer', margin: '0 auto', height: '50px', marginTop: '20px', padding:"20px", borderRadius: "5px", border: 'none' }}
           >
             Have no wallet. Click here to sign up with email
           </button>
@@ -101,7 +87,7 @@ const modalStyles = {
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: '400px',
-    height: 'auto',
+    height: '400px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',

@@ -1,7 +1,7 @@
 import React from 'react'
 import './styles/Channel.css'
 
-const Channel = ({provider, account, channels, decentDisc, currentChannel, setCurrentChannel, gaslessContractCall}) => {
+const Channel = ({provider, account, channels, decentDisc, currentChannel, setCurrentChannel, gaslessContractCall, setLoading, setLoadingStatement, setError, setSuccess}) => {
 
   const channelHandler = async (channel) => {
     const joinedChannel = await decentDisc.joinedChannel(channel.id, account); 
@@ -10,11 +10,25 @@ const Channel = ({provider, account, channels, decentDisc, currentChannel, setCu
       console.log("Joined!")
       setCurrentChannel(channel)
     } else {
+      setLoading(true)
+      setLoadingStatement("Mnting NFT for joining channel...");
       console.log("Mnting NFT for joining channel..."); 
       // const signer = await provider.getSigner(); 
-      const tx = await gaslessContractCall.mint(channel.id, account, {value: channel.cost});
-      await tx.wait();
-      setCurrentChannel(channel); 
+      try {
+        const tx = await gaslessContractCall.mint(channel.id, account, {value: channel.cost});
+        await tx.wait();
+        setCurrentChannel(channel); 
+        setTimeout( () => {
+          setSuccess(true)
+        }, 3000)
+        setLoading(false); 
+      } catch (error) {
+        console.error(error); 
+        setTimeout(() => {
+          setError(true)
+        }, 3000)
+        setLoading(false)
+      }
     }
   }
 

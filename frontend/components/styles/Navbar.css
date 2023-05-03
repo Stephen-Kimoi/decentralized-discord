@@ -1,6 +1,6 @@
 .navbar {
     width: 100%;
-    background-color: white;
+    background-color: var(--main-grey);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -9,11 +9,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .navbar.dark {
-    background-color: var(--main-grey); 
-    color: white;
   }
   
   .navbar-container {
@@ -42,7 +37,7 @@
     font-size: 1.2rem;
     font-weight: bold;
     margin: 0;
-    color: inherit;
+    color: white;
   }
   
   .button-container {
@@ -79,4 +74,13 @@
   .mode-toggle-button:hover {
     text-decoration: underline;
   }
+
+  @media (max-width: 768px) {
+    .navbar {
+      width: 400px;
+    }
+    .logo-container {
+        margin-right: 60px;
+    }
+}
   

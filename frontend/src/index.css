@@ -2,6 +2,7 @@
   padding: 0;
   margin: 0; 
   box-sizing: border-box;
+  color: var(--main-white);
 }
 
 :root {
@@ -16,7 +17,7 @@
 }
 
 main {
-  background-color: var(--main-white);
+  background-color: var(--main-dark-grey);
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   height: 92vh;

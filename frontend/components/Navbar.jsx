@@ -79,7 +79,6 @@ const Navbar = ({
       <div className="navbar-container">
 
         <div className="logo-container">
-          {/* <img src="/path/to/logo.png" alt="DecentDisc Logo" className="logo" /> */}
           <h1 className="logo-text">DecentDisc</h1>
         </div>
         
@@ -122,10 +121,6 @@ const Navbar = ({
               </button>
             )
           }
-        
-          <button className='node-toggle-button' onClick={handleToggleDarkMode}>
-              {isDarkMode ? "Light Mode" : "Dark Mode"}
-          </button>
         </div>
 
       </div>
