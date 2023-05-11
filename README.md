@@ -1,13 +1,19 @@
-# Sample Hardhat Project
+# DECENTRALIZED DISCORD 
+This is a decentralized version of discord built with `React` frontend, `Node js` backend and `solidity` smart contract deployed on `Popygon Mumbai`
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Main functionalities: 
+1. One needs a to get a pass to join one of the channels (Mint an NFT)
+2. Have no wallet? Don't worry, you can sign up with email and join one of the channels 
+3. Gasless transactions. No need to pay gas for getting a pass to join one of the channels
 
-Try running some of the following tasks:
+## Getting started: 
+`git clone ` 
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+`npm install` 
+
+`cd frontend` 
+
+`npm install` 
+
+`npm run dev` 
+
