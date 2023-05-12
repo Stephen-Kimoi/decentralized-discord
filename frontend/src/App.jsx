@@ -14,7 +14,7 @@ import WagmiWallet from '../components/WagmiWallet';
 import { client } from '../components/WalletConnection/WagmiWalletConnect';
 import LoadingModal from '../components/Loading/Loading';
 
-const socket = io('https://decentralized-discord-server-wh1z.onrender.com/'); 
+const socket = io('http://localhost:3030/'); 
 
 const testnetAccountPrivateKey = config.privateKey
 const alchemyRpcProvider = config.rpcProvider
@@ -24,23 +24,18 @@ function App() {
   const [account, setAccount] = useState(null); 
   const {walletConnected, setWalletConnected} = useState(false); 
   const [normalProvider, setProvider] = useState(); 
-  // const [emailSigner, setEmailSigner] = useState(); 
   const [gaslessContractCall, setGaslessContractCall] = useState(); 
   const [decentDiscProvider, setDecentDiscProvider] = useState(); 
-  const [decentDiscSigner, setDecentDiscSigner] = useState(); 
-  const [decentDiscToken, setDecentDiscToken] = useState(); 
   const [channels, setChannels] = useState([]); 
   const [currentChannel, setCurrentChannel] = useState(null); 
   const [messages, setMessages] = useState([]); 
   const [accountPoints, setAccountPoints] = useState([]); 
   const [newAccountPoints, setNewAccountPoints] = useState([]);
-  const [accountsWithMorePoints, setAccountsWithMorePoints] = useState([]); 
   const [accountsSentMessages, setAccountsSentMessages] = useState(); 
   const [channelCreators, setChannelCreators] = useState([]); 
   const [paperWallet, setPaperWallet] = useState(false); 
   const [currentUser, updateUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
-  // const [connected, toggleConnect] = useState(false);
   const [signedUpWithEmail, setSignedUpWithEmail] = useState(false); 
   const [signedUpWithWagmi, setSignedUpWithWagmi] = useState(false); 
   const [loading, setLoading] = useState(false); 
@@ -73,7 +68,7 @@ function App() {
 
     if (currentUser !== null) {
       const signer = await currentUser.wallet.getEthersJsSigner({
-        rpcEndpoint: alchemyRpcProvider, // REMOVE THIS
+        rpcEndpoint: alchemyRpcProvider, 
       });
 
       decentDiscProvider = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, signer); 
@@ -106,12 +101,6 @@ function App() {
       const decentDiscGasless = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, wallet);
       setGaslessContractCall(decentDiscGasless); 
 
-      // REMOVE THIS CODE
-      const decentDiscToken = new ethers.Contract(constants[31337].DecentDiscToken.address, tokenAbi, provider);
-      setDecentDiscToken(decentDiscToken); 
-      const decentDiscSigner = new ethers.Contract(constants[31337].DecentDisc.address, contractAbi, signer);
-      setDecentDiscSigner(decentDiscSigner); 
-
     }
     
     setDecentDiscProvider(decentDiscProvider);
@@ -134,14 +123,12 @@ function App() {
 
   const updateAccounts = (messages) => {
     const updatedAccounts = accountPoints.map((account) => {
-      // console.log("Account is: ", account)
       const accountMessages = messages.filter((message) => {
         return message.account === account.account; 
       })
       const points = accountMessages.length; 
       return {...account, points}; 
     })
-    // console.log("UPDATED ACCOUNTS: ", updatedAccounts); 
     setNewAccountPoints(updatedAccounts); 
   }
 
@@ -150,7 +137,6 @@ function App() {
       setLoading(false); 
       loadBlockchainData();
     } 
-    // checkAccountPoints(); 
 
     socket.on('connect', () => {
       console.log("Socket connected...")
@@ -161,7 +147,6 @@ function App() {
 
     socket.on('channel creators', (channelCreators) => {
       setChannelCreators(channelCreators); 
-      // console.log("NEW CHANNEL CREATORS: ", channelCreators); 
     })
 
     socket.on('get points', (accounts) => {
@@ -170,6 +155,7 @@ function App() {
 
     socket.on('new message', (messages) => {
       console.log("new message..."); 
+      console.log("Messages: ", messages)
       setMessages(messages); 
     })
 
@@ -178,7 +164,6 @@ function App() {
       setMessages(messages); 
       let accounts = []; 
       accounts = messages.map(message => message.account); 
-      // console.log("Accounts socket on: ", accounts)
       setAccountsSentMessages(accounts);
     })
 
@@ -205,7 +190,6 @@ function App() {
           setIsOpen={setIsOpen}
           handleOpen={handleOpen}
           handleClose={handleClose}
-          // handleSignUpWithEmail={connectWithPaperWallet}
           setAccount={setAccount}
           setSignedUpWithEmail={setSignedUpWithEmail}
           setSignedUpWithWagmi={setSignedUpWithWagmi}
@@ -260,7 +244,6 @@ function App() {
             account={account}
             messages={messages} 
             currentChannel={currentChannel}
-            accountsWithMorePoints={accountsWithMorePoints}
             accountsSentMessages={accountsSentMessages}
             newAccountPoints={newAccountPoints}
             setNewAccountPoints={setNewAccountPoints}
@@ -268,12 +251,6 @@ function App() {
             setChannelCreators={setChannelCreators}
           /> 
         </main>
-
-        {/* <button onClick={sendTokens}>
-          Send tokens
-        </button> */}
-
-        {/* <button onClick={disconnect}>Disconnect wallet</button> */}
 
       </div>
     </WagmiConfig>
