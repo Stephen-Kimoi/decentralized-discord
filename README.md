@@ -6,16 +6,18 @@ Main functionalities:
 2. Have no wallet? Don't worry, you can sign up with email and join one of the channels 
 3. Gasless transactions. No need to pay gas for getting a pass to join one of the channels
 
+Site demo: https://www.loom.com/share/5421e1ee48a143908110061218c57ad9
+
 ## Getting started: 
 `git clone ` 
 
 `npm install` 
+
+`node server.js` 
 
 `cd frontend` 
 
 `npm install` 
 
 `npm run dev` 
-
-`node server.js` 
 
