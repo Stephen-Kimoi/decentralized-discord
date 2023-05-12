@@ -17,3 +17,5 @@ Main functionalities:
 
 `npm run dev` 
 
+`node server.js` 
+
