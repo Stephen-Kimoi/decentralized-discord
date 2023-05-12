@@ -9,7 +9,7 @@ Main functionalities:
 Site demo: https://www.loom.com/share/5421e1ee48a143908110061218c57ad9
 
 ## Getting started: 
-`git clone ` 
+`git clone https://github.com/Stephen-Kimoi/decentralized-discord.git` 
 
 `npm install` 
 
